@@ -1,0 +1,3070 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fff7fb" />
+  <title>Հետազոտության մեթոդաբանություն</title>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fff8fc;
+      --surface: #ffffff;
+      --surface-soft: #fff0f7;
+      --surface-alt: #fbf5ff;
+      --text: #30263a;
+      --muted: #786c80;
+      --pink: #cb5795;
+      --pink-dark: #9b3470;
+      --pink-light: #f5d4e6;
+      --lavender: #8266b3;
+      --lavender-light: #eee8fa;
+      --border: #f0deea;
+      --shadow: 0 14px 40px rgba(98, 48, 90, 0.09);
+      --radius: 22px;
+      --sidebar-width: 258px;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --bg: #17131b;
+      --surface: #211b27;
+      --surface-soft: #30202e;
+      --surface-alt: #282134;
+      --text: #f5edf6;
+      --muted: #c0b2c5;
+      --pink: #ee8abd;
+      --pink-dark: #f4a5ce;
+      --pink-light: #57354b;
+      --lavender: #bba4ed;
+      --lavender-light: #373049;
+      --border: #413247;
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(237, 194, 219, .23), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      font-family: "Noto Sans Armenian", "Segoe UI", Arial, sans-serif;
+      line-height: 1.75;
+      transition: background .25s, color .25s;
+    }
+
+    button { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      padding-right: var(--sidebar-width);
+    }
+
+    .sidebar {
+      position: fixed;
+      z-index: 20;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      padding: 23px 17px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -10px 0 35px rgba(76, 40, 72, .04);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 5px 8px 21px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      flex: 0 0 auto;
+      color: white;
+      border-radius: 15px;
+      background: linear-gradient(145deg, var(--pink), var(--lavender));
+      box-shadow: 0 7px 18px rgba(203, 87, 149, .23);
+      font-size: 21px;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .nav-label {
+      margin: 22px 9px 10px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .topic-nav {
+      display: grid;
+      gap: 7px;
+      overflow-y: auto;
+      padding: 0 2px 12px;
+    }
+
+    .topic-button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 11px 10px;
+      text-align: right;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .topic-button:hover {
+      color: var(--text);
+      background: var(--surface-soft);
+    }
+
+    .topic-button.active {
+      color: var(--pink-dark);
+      background: var(--surface-soft);
+      border-color: var(--pink-light);
+      font-weight: 750;
+    }
+
+    .topic-number {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 auto;
+      color: var(--lavender);
+      background: var(--lavender-light);
+      border-radius: 11px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .topic-button.active .topic-number {
+      color: white;
+      background: linear-gradient(145deg, var(--pink), var(--lavender));
+    }
+
+    .topic-name {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding-top: 13px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sidebar-hint {
+      margin: 0 5px 12px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.65;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tool-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 39px;
+      padding: 8px 11px;
+      color: var(--text);
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .tool-button:hover {
+      color: var(--pink-dark);
+      border-color: var(--pink-light);
+      transform: translateY(-1px);
+    }
+
+    .toolbar .tool-button { flex: 1; font-size: 11px; }
+
+    main {
+      width: min(100%, 1160px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 36px clamp(18px, 5vw, 70px) 80px;
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 21px;
+    }
+
+    .eyebrow {
+      color: var(--pink-dark);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .mobile-tools { display: none; gap: 7px; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(24px, 5vw, 47px);
+      background:
+        linear-gradient(125deg, var(--surface) 15%, var(--surface-soft) 100%);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "✦";
+      position: absolute;
+      right: 7%;
+      bottom: -70px;
+      color: rgba(203, 87, 149, .08);
+      font-size: 260px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      color: var(--pink-dark);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 850px;
+      margin: 17px 0 13px;
+      font-size: clamp(25px, 4.1vw, 43px);
+      line-height: 1.3;
+      letter-spacing: -.025em;
+    }
+
+    .hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 750px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .content-section { margin-top: 36px; }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      margin-bottom: 17px;
+    }
+
+    .section-index {
+      display: grid;
+      place-items: center;
+      width: 39px;
+      height: 39px;
+      flex: 0 0 auto;
+      color: var(--pink-dark);
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    h2 {
+      margin: 1px 0 0;
+      font-size: clamp(19px, 2.8vw, 25px);
+      line-height: 1.45;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    p { margin: 0 0 13px; }
+
+    .card {
+      margin-top: 14px;
+      padding: clamp(17px, 3vw, 25px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 20px rgba(78, 43, 74, .035);
+    }
+
+    .lead-card {
+      border-right: 4px solid var(--pink);
+      background: linear-gradient(110deg, var(--surface), var(--surface-soft));
+    }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+
+    .bullet-list, .number-list {
+      margin: 9px 0 0;
+      padding-right: 22px;
+    }
+
+    .bullet-list li, .number-list li { padding: 3px 0; }
+    li::marker { color: var(--pink); }
+
+    .question-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 17px;
+    }
+
+    .question {
+      padding: 13px 15px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      font-size: 13px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: right;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--pink-dark);
+      background: var(--surface-soft);
+      font-weight: 800;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(115px, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+
+    .flow-step {
+      position: relative;
+      min-width: 115px;
+      padding: 15px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: "←";
+      position: absolute;
+      top: 14px;
+      left: -13px;
+      z-index: 1;
+      color: var(--pink);
+      font-weight: 900;
+    }
+
+    .flow-step b {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--pink-dark);
+      font-size: 12px;
+    }
+
+    .flow-step span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .callout {
+      margin-top: 14px;
+      padding: 14px 16px;
+      background: var(--lavender-light);
+      border-right: 3px solid var(--lavender);
+      border-radius: 13px;
+    }
+
+    .callout.good { background: var(--surface-soft); border-color: var(--pink); }
+    .callout.bad { background: var(--surface-alt); border-color: #bd86ae; }
+    .callout strong { display: block; margin-bottom: 4px; font-size: 13px; }
+    .callout p { margin: 0; font-size: 13px; }
+
+    .system-diagram {
+      display: grid;
+      grid-template-columns: 1fr auto 1.4fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      padding: 20px;
+      text-align: center;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    .diagram-box {
+      padding: 15px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .diagram-box strong { display: block; color: var(--pink-dark); }
+    .diagram-box span { color: var(--muted); font-size: 11px; }
+    .diagram-arrow { color: var(--pink); font-size: 23px; font-weight: 900; }
+
+    .system-elements {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .system-note {
+      grid-column: 1 / -1;
+      color: var(--lavender);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .example-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .example-card {
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .example-card .icon { margin-bottom: 7px; font-size: 19px; }
+    .example-card p { margin: 0; color: var(--muted); font-size: 12px; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .mistake-title { color: var(--pink-dark); }
+    .good-title { color: var(--lavender); }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .resource {
+      padding: 13px 11px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .resource strong { display: block; margin-bottom: 5px; font-size: 12px; }
+    .resource span { color: var(--muted); font-size: 11px; line-height: 1.55; }
+
+    .placeholder {
+      min-height: 52vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 35px;
+      background: var(--surface);
+      border: 1px dashed var(--pink-light);
+      border-radius: 24px;
+    }
+
+    .placeholder-inner { max-width: 510px; }
+    .placeholder-icon { font-size: 45px; }
+    .placeholder h2 { margin: 8px 0; }
+    .placeholder p { color: var(--muted); }
+
+    .footer-note {
+      margin-top: 36px;
+      padding-top: 16px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    @media (max-width: 1050px) {
+      :root { --sidebar-width: 225px; }
+      .resource-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .flow { grid-template-columns: repeat(3, minmax(130px, 1fr)); }
+    }
+
+    @media (max-width: 720px) {
+      :root { --sidebar-width: 0px; }
+
+      .app { padding-right: 0; }
+
+      .sidebar {
+        top: auto;
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+        width: auto;
+        height: auto;
+        padding: 9px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: 0 12px 35px rgba(40, 20, 40, .17);
+      }
+
+      .brand, .nav-label, .sidebar-hint, .sidebar-bottom { display: none; }
+
+      .topic-nav {
+        display: flex;
+        gap: 7px;
+        overflow-x: auto;
+        padding: 0;
+      }
+
+      .topic-button {
+        width: auto;
+        min-width: 69px;
+        flex-direction: column;
+        gap: 4px;
+        padding: 5px 8px;
+        text-align: center;
+      }
+
+      .topic-number { width: 29px; height: 29px; }
+      .topic-name { white-space: nowrap; font-size: 10px; }
+      main { padding: 23px 16px 112px; }
+      .mobile-tools { display: flex; }
+      .mobile-tools .tool-button { min-height: 35px; padding: 6px 9px; font-size: 11px; }
+      .question-list, .example-grid, .two-col { grid-template-columns: 1fr; }
+      .system-diagram { grid-template-columns: 1fr; }
+      .diagram-arrow { transform: rotate(-90deg); }
+      .system-note { grid-column: 1; }
+      .resource-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flow { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+      .flow-step:not(:last-child)::after { display: none; }
+      .hero { border-radius: 22px; }
+    }
+
+    @media print {
+      :root {
+        --bg: #fff;
+        --surface: #fff;
+        --surface-soft: #fff6fa;
+        --surface-alt: #f8f5fb;
+        --text: #211a25;
+        --muted: #514958;
+        --border: #e8dce5;
+        --shadow: none;
+      }
+
+      body { background: white; }
+      .sidebar, .mobile-tools { display: none !important; }
+      .app { padding: 0; }
+      main { width: 100%; padding: 0; }
+      .hero, .card { box-shadow: none; break-inside: avoid; }
+      .content-section { break-inside: avoid; }
+      .topic-content[hidden] { display: none !important; }
+    }
+    .question-method-diagram {
+  margin: 18px 0;
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+.qmd-title {
+  width: min(100%, 460px);
+  margin: 0 auto 28px;
+  padding: 13px 18px;
+  text-align: center;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.qmd-title strong,
+.qmd-title span {
+  display: block;
+}
+
+.qmd-title strong {
+  font-size: 14px;
+}
+
+.qmd-title span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.qmd-branches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.qmd-branch {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.qmd-box {
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 14px;
+  text-align: center;
+  border: 1px solid;
+  border-radius: 17px;
+}
+
+.qmd-box strong {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.qmd-box span {
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.quantitative .qmd-box {
+  color: #93533e;
+  background: #fff0e9;
+  border-color: #e8b9a8;
+}
+
+.qualitative .qmd-box {
+  color: #27796e;
+  background: #e8f7f2;
+  border-color: #a8d7ca;
+}
+
+body.dark .quantitative .qmd-box {
+  color: #ffd2bf;
+  background: #3b2826;
+  border-color: #805345;
+}
+
+body.dark .qualitative .qmd-box {
+  color: #baf0df;
+  background: #203732;
+  border-color: #477c6e;
+}
+
+.qmd-arrow {
+  height: 34px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 22px;
+}
+
+.qmd-caption {
+  max-width: 650px;
+  margin: 22px auto 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .qmd-branches {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .qmd-title {
+    margin-bottom: 20px;
+  }
+}
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Թեմաների ցանկ">
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div>
+          <strong>Հետազոտության<br>մեթոդաբանություն</strong>
+          <span>Ուսումնական նյութեր</span>
+        </div>
+      </div>
+
+      <div class="nav-label">Դասընթացի թեմաները</div>
+      <nav class="topic-nav" id="topicNav"></nav>
+
+      <div class="sidebar-bottom">
+        <p class="sidebar-hint">Ընտրիր թեման՝ դրա ամբողջական նյութը դիտելու համար։</p>
+        <div class="toolbar">
+          <button class="tool-button" id="themeButton" type="button" aria-label="Փոխել գունային ռեժիմը">
+            <span id="themeIcon">☾</span>
+            <span id="themeText">Մութ ռեժիմ</span>
+          </button>
+          <button class="tool-button" type="button" onclick="toggleFullscreen()" aria-label="Միացնել ամբողջ էկրանը">
+            ⛶ <span>Ամբողջ էկրան</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="topline">
+        <div class="eyebrow">Ուսումնական հարթակ · Կառավարման հետազոտություններ</div>
+        <div class="mobile-tools">
+          <button class="tool-button" id="mobileThemeButton" type="button" aria-label="Փոխել գունային ռեժիմը">☾</button>
+          <button class="tool-button" type="button" onclick="toggleFullscreen()" aria-label="Միացնել ամբողջ էկրանը">⛶</button>
+        </div>
+      </div>
+
+      <div id="topic1" class="topic-content">
+        <header class="hero">
+          <span class="hero-label">Թեմա 1 · Հիմնարար հասկացություններ</span>
+          <h1>Կառավարման համակարգը որպես հետազոտության օբյեկտ։ Համակարգային մոտեցումը կառավարման համակարգերի հետազոտության գործընթացում</h1>
+          <p>Այս թեման ներկայացնում է գիտական հետազոտության տրամաբանությունը, համակարգային մոտեցման նշանակությունը և հետազոտության հիմնական բաղադրիչները՝ օբյեկտից ու նպատակից մինչև ռեսուրսներ և արդյունավետություն։</p>
+        </header>
+
+        <section class="content-section" id="scientific-research">
+          <div class="section-heading">
+            <div class="section-index">01</div>
+            <h2>Գիտական հետազոտության էությունը և հատկանիշները։ Համակարգային մոտեցման դերը</h2>
+          </div>
+
+          <div class="card lead-card">
+            <p><strong>Գիտական հետազոտությունը</strong> համակարգված, մեթոդական և ստուգելի գործընթաց է, որի նպատակն է ստանալ նոր, հիմնավորված գիտելիք որևէ երևույթի, խնդրի կամ գործընթացի մասին։</p>
+            <p>Սա մի ճանապարհ է, որի ընթացքում մարդը փորձում է հասկանալ ինչ-որ երևույթ, այդ թվում՝ այդ երևույթի պատճառներն ու հետևանքները, միաժամանակ բացատրել դրանց միջև առկա կապերը և այդ ամենի արդյունքում ստեղծել նոր գիտելիք։ Այս առումով, հետազոտել նշանակում է ձևակերպել գիտական հարցադրում և փնտրել հիմնավորված պատասխաններ։</p>
+            <p class="muted">Այս բոլոր հարցերը գիտական են դառնում այն ժամանակ, երբ դրանց պատասխանը որոնվում է փաստերի, տվյալների և տրամաբանության միջոցով, այլ ոչ թե ենթադրություններով կամ կարծիքներով։</p>
+          </div>
+
+          <div class="question-list">
+            <div class="question">Ինչո՞ւ են մարդիկ ընտրում այս կամ այն վարքագիծը։</div>
+            <div class="question">Ինչպե՞ս են քաղաքական որոշումները ազդում տնտեսության վրա։</div>
+            <div class="question">Ինչպիսի՞ գործոններ են ձևավորում հասարակական կարծիքը։</div>
+            <div class="question">Ինչպե՞ս է ժամանակի ընթացքում զարգանում որևէ գործընթաց։</div>
+          </div>
+
+          <div class="card">
+            <p>Գիտական հետազոտությունը չի կրկնում արդեն ասվածը, այլ ստեղծագործական մոտեցմամբ փորձում է հայտնիին ավելացնել նոր դիտանկյուն, բացահայտել նոր կապեր ու առնչություններ, կամ առաջարկել նոր լուծումներ։</p>
+            <p>Հետազոտությունը սովորեցնում է մտածել համակարգված, տարբերել կարծիքը փաստից, կառուցել հիմնավորումներ, ինչպես նաև հստակ և համոզիչ ձևով ձևակերպել սեփական եզրակացությունները։</p>
+          </div>
+
+          <div class="card">
+            <h3>Աղյուսակ 1. Գիտական հետազոտության հատկանիշները</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Հատկանիշ</th><th>Բացատրություն</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Նպատակայնություն</strong></td><td>Հետազոտությունն միշտ ունի հստակ նպատակ և հետազոտական հարց, որի շուրջ կառուցվում է ամբողջ աշխատանքը։</td></tr>
+                  <tr><td><strong>Հիմնավորվածություն</strong></td><td>Ներկայացված ամեն պնդում, գաղափար կամ եզրակացություն պետք է փաստարկ լինի կամ հղում ունենա։</td></tr>
+                  <tr><td><strong>Օբյեկտիվություն</strong></td><td>Հեղինակը փորձում է ոչ թե համոզել իր կարծիքով, այլ ցույց տալ արդյունքներ, որոնք հիմնված են իրական փաստերի վրա։</td></tr>
+                  <tr><td><strong>Համակարգվածություն</strong></td><td>Աշխատանքը կառուցված է հստակ տրամաբանական հաջորդականությամբ՝ «թեմա → հարց → մեթոդ → արդյունք → եզրակացություն» սկզբունքով։</td></tr>
+                  <tr><td><strong>Ստուգելիություն</strong></td><td>Յուրաքանչյուր պնդում պետք է հնարավոր լինի ստուգել կամ վերարտադրել՝ կրկնելով մեթոդը կամ վերլուծելով տվյալները։</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Ինչո՞ւ է հետազոտական հմտությունը կարևոր</h3>
+            <ul class="bullet-list">
+              <li><strong>Հիմնավորված որոշումների կայացում</strong>՝ ինտուիցիայի կամ ենթադրության փոխարեն, ինչը նվազեցնում է ռիսկերը։</li>
+              <li><strong>Խնդիրների արմատական ախտորոշում</strong>՝ ախտանիշները տարբերակելով իրական պատճառներից։</li>
+              <li><strong>Փոփոխությունների կանխատեսում</strong> և ժամանակին հարմարվողականություն փոփոխվող միջավայրին։</li>
+              <li><strong>Մասնագիտական վստահելիություն</strong> ղեկավարության, գործընկերների և ներդրողների առջև։</li>
+              <li><strong>Շարունակական, ինքնուրույն ուսուցման</strong> կարողություն։</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Գիտական հետազոտության վեց հաջորդական փուլերը</h3>
+            <div class="flow">
+              <div class="flow-step"><b>1. Ներածություն</b><span>Հետազոտական հարց, ինչու և ինչպես։</span></div>
+              <div class="flow-step"><b>2. Գրականության վերլուծություն</b><span>Առկա գիտելիք, բացերի հայտնաբերում։</span></div>
+              <div class="flow-step"><b>3. Մեթոդաբանություն</b><span>Տվյալների հավաքագրման եղանակ։</span></div>
+              <div class="flow-step"><b>4. Տվյալների հավաքագրում</b><span>Սկզբնական հավաքագրում և վերլուծություն։</span></div>
+              <div class="flow-step"><b>5. Վերլուծություն</b><span>Արդյունքներ և հեղինակի մեկնաբանություն։</span></div>
+              <div class="flow-step"><b>6. Եզրակացություն</b><span>Ներդրում և նշանակություն։</span></div>
+            </div>
+            <ol class="number-list">
+              <li><strong>Ներածություն</strong> — ձևակերպվում է հետազոտական հարցը, հիմնավորվում է թեմայի կարևորությունը և ընդհանուր գծերով ներկայացվում է հետազոտության մոտեցումը։</li>
+              <li><strong>Գրականության վերլուծություն</strong> — ուսումնասիրվում են թեմայի վերաբերյալ առկա գիտական աշխատանքները՝ խնդրի ուսումնասիրվածության աստիճանի «բացը» գտնելու համար։</li>
+              <li><strong>Մեթոդաբանություն</strong> — նկարագրվում է, թե ինչպես և ինչպիսի մեթոդներով է իրականացվել հետազոտությունը, հաշվի են առնվում էթիկայի հարցերը և հասանելի ռեսուրսները։</li>
+              <li><strong>Տվյալների հավաքագրում</strong> — իրականացվում է տվյալների սկզբնական հավաքագրում և վերլուծություն, որը հաճախ հետադարձաբար ճշգրտում է մեթոդաբանությունը։ Այդ պատճառով 3-րդ և 4-րդ փուլերի միջև կա երկկողմանի կապ։</li>
+              <li><strong>Վերլուծություն</strong> — հեղինակը ներկայացնում է հետազոտության արդյունքներն ու դրանց առնչությամբ իր մեկնաբանությունը։</li>
+              <li><strong>Եզրակացություն</strong> — ամփոփվում է հետազոտության ներդրումը գիտելիքի մեջ և բացատրվում է դրա գործնական կամ տեսական նշանակությունը։</li>
+            </ol>
+            <div class="callout"><p>Այս ընդհանուր տրամաբանության հիման վրա է կառուցվում կառավարման համակարգերի հետազոտության մասնագիտացված մեթոդաբանությունը։</p></div>
+          </div>
+
+          <div class="card">
+            <h3>Համակարգային մոտեցման բնույթն ու էությունը</h3>
+            <p>Ժամանակակից կառավարման գիտության մեջ ցանկացած կազմակերպություն, ձեռնարկություն կամ նույնիսկ առանձին կառավարչական գործընթաց այլևս չի դիտարկվում որպես մեկուսացված տարրերի հավաքածու։ Փոխարենը կիրառվում է <strong>համակարգային մոտեցումը (system approach)</strong>՝ որպես գիտական իմացության մեթոդաբանական ուղղություն, որի հիմքում ընկած է օբյեկտների ուսումնասիրումը որպես համակարգեր։</p>
+            <p>Համակարգային մոտեցման էությունը կայանում է նրանում, որ՝</p>
+            <ul class="bullet-list">
+              <li>Ցանկացած օբյեկտ դիտարկվում է որպես փոխկապակցված տարրերի ամբողջություն, որտեղ ամբողջն ունի հատկություններ, որոնք բացակայում են առանձին տարրերի մոտ՝ <strong>համակարգային արդյունքի սկզբունք</strong>։</li>
+              <li>Ուսումնասիրվում են ոչ միայն տարրերը, այլև նրանց միջև եղած կապերն ու փոխազդեցությունները։</li>
+              <li>Օբյեկտը դիտարկվում է իր միջավայրի հետ փոխազդեցության մեջ. համակարգը ստանում է մուտքային ռեսուրսներ (input) և արտադրում է արդյունք (output)։</li>
+              <li>Կիրառվում է բազմամակարդակ վերլուծություն, քանի որ միևնույն օբյեկտը կարող է լինել և՛ ինքնուրույն համակարգ, և՛ ավելի մեծ համակարգի ենթահամակարգ։</li>
+            </ul>
+
+ <div class="question-method-diagram">
+  <div class="qmd-title">
+    <strong>Հետազոտական հարցի բնույթը</strong>
+    <span>Ի՞նչ է ուզում իմանալ հետազոտողը</span>
+  </div>
+
+  <div class="qmd-branches">
+    <div class="qmd-branch quantitative">
+      <div class="qmd-box">
+        <strong>«Ինչքա՞ն, քանի՞»</strong>
+        <span>Չափելի, թվային ցուցանիշների որոնում</span>
+      </div>
+      <div class="qmd-arrow">↓</div>
+      <div class="qmd-box">
+        <strong>Քանակական մեթոդներ</strong>
+        <span>Հարցում, վիճակագրական վերլուծություն</span>
+      </div>
+    </div>
+
+    <div class="qmd-branch qualitative">
+      <div class="qmd-box">
+        <strong>«Ինչո՞ւ, ինչպե՞ս»</strong>
+        <span>Երևույթի բովանդակային մեկնաբանության որոնում</span>
+      </div>
+      <div class="qmd-arrow">↓</div>
+      <div class="qmd-box">
+        <strong>Որակական մեթոդներ</strong>
+        <span>Հարցազրույց, դիտարկում, փաստաթղթերի վերլուծություն</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="qmd-caption">
+    Հետազոտողը սկզբում սահմանում է հարցի բնույթը, ապա ընտրում դրան
+    համապատասխան մեթոդները։
+  </div>
+</div>
+
+            <p>Համակարգային մոտեցումը հակադրվում է «զուտ վերլուծական մոտեցմանը», որի դեպքում օբյեկտը մասնատվում է առանձին բաղադրիչների և ուսումնասիրվում է դրանցից յուրաքանչյուրն առանձին՝ անտեսելով դրանց փոխազդեցությունը։ Կառավարման համակարգերի հետազոտության մեջ զուտ վերլուծական մոտեցումը հաճախ տալիս է սխալ կամ թերի արդյունք, քանի որ կառավարման խնդիրները հազվադեպ են լինում մեկուսացված։</p>
+          </div>
+
+          <h3 style="margin-top:22px">Համակարգային մոտեցման կիրառման օրինակներ</h3>
+          <div class="example-grid">
+            <div class="example-card"><div class="icon">🏢</div><p>Ընկերության վաճառքների անկումը հետազոտելիս պետք է ուսումնասիրել ոչ միայն վաճառքների բաժինը, այլև արտադրանքի որակը, գնային քաղաքականությունը, մրցակցային միջավայրը և հաճախորդների սպասարկումը՝ որպես փոխկապակցված գործոններ։</p></div>
+            <div class="example-card"><div class="icon">🏦</div><p>Բանկում նոր թվային ծառայության ներդրումն ազդում է ոչ միայն ՏՏ բաժնի, այլև հաճախորդների սպասարկման, իրավաբանական, անվտանգության և մարքեթինգի ստորաբաժանումների վրա։ Համակարգային մոտեցումն օգնում է կանխատեսել շղթայական ազդեցությունները։</p></div>
+            <div class="example-card"><div class="icon">🏥</div><p>Հիվանդանոցի կառավարման հետազոտության ժամանակ առանձին բաժինների օպտիմալացումն առանց հիվանդների հոսքի համակարգման կարող է խնդիրներ ստեղծել մյուս բաժիններում։</p></div>
+          </div>
+
+          <div class="callout bad">
+            <strong>Սխալ մոտեցում և հետևանք</strong>
+            <p>Հետազոտող խումբը վերլուծում է միայն վաճառքների բաժնի ներքին տվյալները՝ անձնակազմը, կոնվերսիան և զանգերը՝ անտեսելով արտադրանքի որակը, գները և մրցակիցներին։ Հետազոտությունը սխալմամբ եզրակացնում է, որ խնդիրը թույլ մոտիվացիան է։ Ներդրվում է նոր բոնուսային համակարգ, սակայն վաճառքները շարունակում են նվազել, քանի որ իրական պատճառը եղել է մրցակցի ավելի ցածր գինը։ Ռեսուրսներ և ժամանակ են վատնվում սխալ ախտորոշման վրա։</p>
+          </div>
+        </section>
+
+        <section class="content-section" id="categories">
+          <div class="section-heading">
+            <div class="section-index">02</div>
+            <h2>Կառավարման համակարգերի հետազոտության կատեգորիաները, սկզբունքները, մեթոդաբանությունը</h2>
+          </div>
+
+          <div class="card">
+            <h3>Համակարգային մոտեցման հիմնական կատեգորիաները</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Կատեգորիա</th><th>Բովանդակություն</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Համակարգ</strong></td><td>Փոխկապակցված տարրերի ամբողջություն՝ ընդհանուր նպատակով։</td></tr>
+                  <tr><td><strong>Ենթահամակարգ</strong></td><td>Համակարգի ինքնուրույն մաս, որն ինքն էլ ունի համակարգային հատկություններ։</td></tr>
+                  <tr><td><strong>Տարր</strong></td><td>Համակարգի հետագա չտրոհվող բաղադրիչ՝ տվյալ վերլուծության մակարդակում։</td></tr>
+                  <tr><td><strong>Կապ</strong></td><td>Տարրերի միջև փոխազդեցության ուղի՝ տեղեկատվական, նյութական կամ կառավարչական։</td></tr>
+                  <tr><td><strong>Կառուցվածք</strong></td><td>Կապերի կայուն, կանոնավոր ձևը։</td></tr>
+                  <tr><td><strong>Ֆունկցիա</strong></td><td>Համակարգի կամ տարրի կատարած դերը։</td></tr>
+                  <tr><td><strong>Միջավայր</strong></td><td>Ամեն ինչ, ինչ գտնվում է համակարգի սահմաններից դուրս, բայց ազդում է դրա վրա։</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout good"><strong>Օրինակ՝ առևտրային ընկերություն</strong><p>Ամբողջ ընկերությունը համակարգն է, ֆինանսների բաժինը՝ ենթահամակարգ, կոնկրետ հաշվապահը՝ տարր, բաժինների միջև հաշվետվությունների փոխանակումը՝ կապ, հաստիքացուցակը՝ կառուցվածք, բյուջեի պլանավորումը՝ ֆինանսների բաժնի ֆունկցիա, իսկ շուկան ու մրցակիցները՝ միջավայր։</p></div>
+          </div>
+
+          <div class="card">
+            <h3>Հետազոտության հինգ հիմնական սկզբունքները</h3>
+            <ol class="number-list">
+              <li><strong>Ամբողջականության սկզբունք</strong> — համակարգը դիտարկվում է որպես ամբողջություն, ոչ թե մասերի հանրագումար։</li>
+              <li><strong>Կառուցվածքայնության սկզբունք</strong> — վարքագիծը բացատրվում է ոչ միայն առանձին տարրերով, այլև ընդհանուր կառուցվածքով։</li>
+              <li><strong>Հիերարխիկության սկզբունք</strong> — համակարգը դիտարկվում է որպես բազմամակարդակ՝ տարր → ենթահամակարգ → համակարգ → գերհամակարգ։</li>
+              <li><strong>Փոխկապակցվածության սկզբունք</strong> — համակարգը և միջավայրը փոխազդում են երկկողմանիորեն։</li>
+              <li><strong>Բազմակողմանիության սկզբունք</strong> — մեկ համակարգ կարող է նկարագրվել մի քանի տեսանկյուններից՝ կառուցվածքային, ֆունկցիոնալ և տեղեկատվական։</li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <h3>Մեթոդաբանական հիմքը</h3>
+            <p>Մեթոդաբանական հիմքը կազմում են վերլուծություն և սինթեզ, ինդուկցիա և դեդուկցիա, մոդելավորում (հատկապես՝ կառուցվածքային և ֆունկցիոնալ), համեմատական վերլուծություն, ինչպես նաև հատուկ համակարգային մեթոդներ՝ համակարգային վերլուծություն և համակարգային սինթեզ։</p>
+            <p><strong>Համակարգային վերլուծությունը</strong> ներառում է խնդրի կառուցվածքավորում, նպատակների «ծառի» կառուցում, այլընտրանքների գնահատում և որոշման ընդունում անորոշության պայմաններում։</p>
+            <div class="callout good"><strong>Օրինակներ</strong><p>«Նպատակների ծառի» կառուցում․ ընդհանուր նպատակ՝ շահութաբերության աճ, ածանցվող ենթանպատակներ՝ ծախսերի կրճատում, վաճառքի ավելացում, որակի բարձրացում։ Սա հիերարխիկության սկզբունքի կիրառում է։</p><p style="margin-top:8px">Մատակարարման շղթայի հետազոտության ժամանակ կառուցվածքային մոդելավորումն օգտագործվում է մատակարար–արտադրող–դիստրիբյուտոր–սպառող կապերը քարտեզագրելու համար, ինչը թույլ է տալիս բացահայտել «նեղ տեղերը» ամբողջ շղթայում։</p></div>
+          </div>
+
+          <div class="callout bad">
+            <strong>Սխալ մոտեցում և հետևանք</strong>
+            <p>Հետազոտողը փոխում է մեկ ստորաբաժանման՝ մարքեթինգի հաշվետվողականության գիծը՝ չվերլուծելով ազդեցությունը հարակից ստորաբաժանումների՝ վաճառքի և արտադրանքի կառավարման որոշումների կայացման արագության վրա։ Արդյունքում առաջանում է երկակի ենթակայություն, հակասական հանձնարարություններ, ուշացող որոշումներ և թիմային կոնֆլիկտներ։ Ամիսներ անց ընկերությունը ստիպված է լինում կրկին վերանայել կառուցվածքը՝ կրելով լրացուցիչ ծախսեր ու ժամանակի կորուստ։</p>
+          </div>
+        </section>
+
+        <section class="content-section" id="scope-object">
+
+          <div class="card">
+            <h3>Հետազոտության շրջանակը, օբյեկտը և առարկան</h3>
+            <p><strong>Հետազոտության շրջանակը (scope)</strong> սահմանում է հետազոտության ընդգրկման տարածքային, ժամանակային և բովանդակային սահմանները։ Օրինակ՝ ընկերության մեկ բաժնի, թե ամբողջ կազմակերպության մակարդակով, վերջին տարվա, թե հնգամյա տվյալների հիման վրա։</p>
+            <p><strong>Հետազոտության օբյեկտը</strong> այն երևույթը կամ գործընթացն է, որին ուղղված է հետազոտությունը՝ ամբողջությամբ։ <strong>Առարկան</strong> օբյեկտի կոնկրետ կողմը, հատկությունը կամ հարաբերությունների այն ամբողջությունն է, որը հենց ուսումնասիրվում է։ Առարկան միշտ ավելի նեղ է, քան օբյեկտը, և հենց այն է որոշում հետազոտության ուղղվածությունը։</p>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <h3 class="good-title">Օբյեկտի լավ ձևակերպման օրինակներ</h3>
+              <ul class="bullet-list">
+                <li>«Տարածաշրջանային բուժհիմնարկների ցանցի կառավարման համակարգը»։ Հստակ, ամբողջական երևույթ է, որի սահմաններն ընթերցողին պարզ են։</li>
+                <li>«Միջին բիզնեսի ընկերությունների մատակարարման շղթայի կառավարումը ՀՀ-ում»։ Ընդգրկուն է, բայց ունի հստակ սահմաններ՝ ընկերությունների կատեգորիա և երկիր։</li>
+              </ul>
+              <div class="callout bad"><strong>Չափազանց նեղ</strong><p>«Աշխատակիցների մոտիվացիայի մակարդակ» ձևակերպումը օբյեկտի կոնկրետ կողմն է՝ առարկան, ոչ թե ամբողջական երևույթը։ Բացակայում է ավելի լայն համակարգը, որի շրջանակում այս մակարդակը դիտարկվում է։</p></div>
+              <div class="callout bad"><strong>Չափազանց լայն</strong><p>«Կառավարումն ընդհանրապես» ձևակերպումը չափազանց լայն և անորոշ է․ չկա կոնկրետ կազմակերպություն, ոլորտ կամ համակարգ, ուստի հետազոտությունը դառնում է անիրագործելի։</p></div>
+            </div>
+
+            <div class="card">
+              <h3 class="good-title">Առարկայի լավ ձևակերպման օրինակներ</h3>
+              <ul class="bullet-list">
+                <li>«Կառավարման համակարգում որոշումների կայացման գործընթացը՝ անորոշության պայմաններում»։</li>
+                <li>«Հեռավար աշխատանքի պայմաններում թիմային փոխգործակցության և արտադրողականության հարաբերությունը»։</li>
+              </ul>
+              <div class="callout bad"><strong>Օբյեկտն ու առարկան նույնն են</strong><p>«Ընկերության կառավարման համակարգը»՝ որպես օբյեկտ, և նույն «ընկերության կառավարման համակարգը»՝ որպես առարկա։ Առարկան չի նեղացնում օբյեկտը, հետևաբար հետազոտության առանցքը մնում է անհասկանալի։</p></div>
+              <div class="callout bad"><strong>Առարկան չափազանց ընդգրկուն է</strong><p>«Ընկերության բոլոր կառավարչական ասպեկտները՝ ֆինանսներից մինչև անձնակազմ» ձևակերպումը փաստորեն միավորում է բազմաթիվ հնարավոր հետազոտական թեմաներ և դժվարացնում մեթոդի ընտրությունը։</p></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Հետազոտության նպատակի և խնդիրների սահմանում</h3>
+            <p>Օբյեկտն ու առարկան սահմանելուց հետո հետազոտողի հաջորդ քայլը հետազոտության գլխավոր նպատակի (goal) ձևակերպումն է, որին հաջորդում է դրանից բխող կոնկրետ խնդիրների (tasks) ձևակերպումը։ Նպատակը պատասխանում է հարցին՝ «ի՞նչ վերջնական արդյունքի է ձգտում հասնել հետազոտությունը», և պետք է լինի համապատասխան առարկային, չափելի կամ ստուգելի, իրատեսական և ձևակերպված որպես մեկ ամբողջական դատողություն։</p>
+            <p>Եթե նպատակը ցույց է տալիս ընդհանուր ուղղությունը, ապա խնդիրները այն քայլերն են, որոնց միջոցով նպատակն իրագործվում է։ Խնդիրները պետք է ձևակերպվեն որպես գործողություններ և սկսվեն բայով՝ «ուսումնասիրել», «վերլուծել», «բացահայտել», «ներկայացնել», «գնահատել» և այլն։</p>
+            <p>Եթե խնդիրները շատ են, հարկ է ստուգել՝ արդյոք բոլորը կապված են նպատակի հետ։ Նպատակին չառնչվողները պետք է հեռացնել։ Խնդիրների հերթականությունը պետք է լինի տրամաբանական՝ տեսականից դեպի գործնական սկզբունքով։ Սովորաբար ձևակերպվում է չորսից վեց խնդիր՝ կախված աշխատանքի ծավալից և բնույթից։</p>
+          </div>
+
+          <div class="card">
+            <h3>Օրինակ՝ հետազոտության նպատակ և խնդիրներ</h3>
+            <div class="callout good"><strong>Նպատակ</strong><p>Ուսումնասիրել կազմակերպչական մշակույթի ազդեցությունը աշխատակիցների արտադրողականության վրա։</p></div>
+            <p style="margin-top:14px"><strong>Խնդիրներ</strong></p>
+            <ol class="number-list">
+              <li>Ներկայացնել կազմակերպչական մշակույթի դերն ու հիմնական տարրերը ժամանակակից կառավարման տեսության մեջ։</li>
+              <li>Վերլուծել ընկերությունում առկա կազմակերպչական մշակույթի ձևերն ու դրսևորումները։</li>
+              <li>Բացահայտել կազմակերպչական մշակույթի հիմնական բաղադրիչները, որոնք ազդում են աշխատակիցների արտադրողականության վրա։</li>
+              <li>Իրականացնել հարցում՝ պարզելու աշխատակիցների ընկալումները կազմակերպչական մշակույթի և իրենց արտադրողականության փոխկապվածության վերաբերյալ։</li>
+              <li>Համեմատել տարբեր ստորաբաժանումների արդյունքները՝ բացահայտելով մշակութային տարբերությունների ազդեցությունը։</li>
+              <li>Համադրել տեսական և գործնական արդյունքները՝ ձևակերպելով եզրակացություններ և կառավարչական առաջարկություններ։</li>
+            </ol>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <h3 class="mistake-title">Սխալ նպատակ՝ չափազանց ընդհանուր</h3>
+              <p><strong>«Բարելավել կազմակերպչական մշակույթը»։</strong></p>
+              <p class="muted">Անհնար է որոշել, թե ինչ է նշանակում «բարելավել», ո՞ր ցուցանիշով և ի՞նչ աստիճանով։ Նպատակից հնարավոր չէ ածանցել կոնկրետ, ստուգելի խնդիրներ, իսկ աշխատանքի ավարտին հնարավոր չէ գնահատել՝ արդյոք նպատակին հասել ենք։</p>
+            </div>
+            <div class="card">
+              <h3 class="mistake-title">Ճիշտ նպատակ, բայց չափազանց քիչ խնդիրներ</h3>
+              <p><strong>Նպատակ․</strong> բացահայտել արտադրողականության վրա առավելագույնս ազդող մշակութային բաղադրիչները և առաջարկել հաջորդ տարվա կոնկրետ բարելավումներ։</p>
+              <p><strong>Միայն երկու խնդիր․</strong> հարցում անցկացնել և առաջարկություններ ձևակերպել։</p>
+              <p class="muted">Բացակայում են տեսական հիմքի ուսումնասիրությունը, ստորաբաժանումների համեմատությունը և արդյունքների առանձին վերլուծությունը։ Հետազոտությունը ցատկում է հարցումից եզրակացության, և առաջարկությունները մնում են մակերեսային։</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="mistake-title">Ճիշտ նպատակ, բայց չափազանց շատ խնդիրներ</h3>
+            <p>Նույն նպատակի համար 10–12 խնդիր կարող են ընդգրկել բոլոր հնարավոր ենթաուղղությունները՝ արժեքների, ավանդույթների, հաղորդակցման ոճերի, առաջնորդության, պարգևատրման համակարգի, աշխատանքային պայմանների, թիմային դինամիկայի և հեռավար աշխատանքի ազդեցության ուսումնասիրությունը։</p>
+            <p class="muted">Խնդիրների գերբեռնվածությունը ցրում է ուշադրության կենտրոնը։ Ժամանակն ու ռեսուրսները բաժանվում են այնքան շատ ուղղությունների միջև, որ ոչ մեկը լիարժեք չի ուսումնասիրվում։ Արդյունքում հաշվետվությունը դառնում է ծանրաբեռնված, իսկ առաջարկությունների առաջնահերթությունը՝ անհասկանալի։ Շատ ասելու ցանկությունը հանգեցնում է քիչ ասելուն։</p>
+            <div class="callout"><p>Հետազոտության նպատակն ու խնդիրները աշխատանքի յուրօրինակ «ճանապարհային քարտեզն» են, որոնք թույլ են տալիս կողմնորոշվել՝ որտեղ ենք գնում և ինչպես ենք հասնելու այնտեղ։</p></div>
+          </div>
+        
+        
+
+          <div class="card lead-card">
+            <p>Հետազոտության ցանկացած պլանավորում ի վերջո հանգում է երեք փոխկապակցված հարցի․ <strong>ինչո՞վ ենք հասնելու</strong>՝ ռեսուրսներ, <strong>ինչի՞ ենք հասնելու</strong>՝ արդյունքներ, և <strong>արժե՞ր արդյոք</strong>՝ արդյունավետություն։ Այս երեք հասկացությունները չեն կարող դիտարկվել առանձին-առանձին, քանի որ հենց դրանց հարաբերակցությունն է որոշում հետազոտության իրական արժեքը։</p>
+          </div>
+
+          <div class="card">
+            <h3>Հետազոտության ռեսուրսները</h3>
+            <p>Ռեսուրսները այն միջոցներն են, առանց որոնց հետազոտությունն ուղղակիորեն անհնարին է դառնում։ Ճիշտ գնահատված ռեսուրսները հետազոտության պլանավորման հենասյուներից են։</p>
+            <div class="resource-grid">
+              <div class="resource"><strong>⏱ Ժամանակ</strong><span>Գրականության վերլուծությունը, տվյալների հավաքագրումը, մշակումն ու հաշվետվությունը պահանջում են որոշակի տևողություն։ Թերագնահատված ժամկետը հաճախ նվազեցնում է որակը։</span></div>
+              <div class="resource"><strong>💰 Ֆինանսներ</strong><span>Ներառում են ուղղակի ծախսերը՝ հարցումներ, տվյալների բազաներ, և անուղղակիները՝ հետազոտողների վարձատրություն։</span></div>
+              <div class="resource"><strong>👥 Մարդկային կապիտալ</strong><span>Հետազոտողներ, փորձագետներ և դաշտային աշխատողներ, որոնց իրավասությունն ազդում է տվյալների ու վերլուծության որակի վրա։</span></div>
+              <div class="resource"><strong>📚 Տեղեկատվություն</strong><span>Փաստաթղթերի, տվյալների բազաների և նախորդ հետազոտությունների հասանելիություն։</span></div>
+              <div class="resource"><strong>💻 Տեխնիկական միջոցներ</strong><span>Ծրագրային փաթեթներ և սարքավորումներ՝ տվյալների հավաքագրման ու վերլուծության համար։</span></div>
+            </div>
+            <div class="callout"><p>Այս հինգ տեսակի ռեսուրսները փոխհատուցելի են միայն սահմանափակ չափով։ Ավելի շատ ժամանակը երբեմն կարող է փոխհատուցել ֆինանսների սղությունը, օրինակ՝ ինքնուրույն, ձեռքով կատարվող աշխատանքի միջոցով։ Սակայն մարդկային կապիտալի իրավասության պակասը հազվադեպ է լիարժեք փոխհատուցվում մյուս ռեսուրսներով։</p></div>
+          </div>
+
+          <div class="card">
+            <h3>Հետազոտության հնարավոր արդյունքները</h3>
+            <p>Հետազոտության արդյունքները դրա նյութականացված արգասիքն են և կարող են տարբեր ձևեր ունենալ՝ կախված հետազոտության բնույթից։</p>
+            <ul class="bullet-list">
+              <li><strong>Գիտական եզրակացություններ</strong> — նոր գիտելիք ուսումնասիրված երևույթի մասին։</li>
+              <li><strong>Մոդելներ</strong> — ուսումնասիրվող համակարգի պարզեցված, կիրառելի նկարագրություններ։</li>
+              <li><strong>Առաջարկություններ</strong> — կոնկրետ, կիրառելի քայլեր կառավարման որոշումների կայացման համար։</li>
+              <li><strong>Կանխատեսումներ</strong> — հիմնավորված ենթադրություններ հետագա զարգացումների մասին։</li>
+              <li><strong>Հրապարակումներ</strong> — արդյունքների ֆորմալացված և տարածելի ներկայացում՝ գիտական հոդված, զեկույց կամ ներքին հաշվետվություն։</li>
+            </ul>
+            <div class="callout good"><p>Արդյունքը պետք է լինի կոնկրետ առաջարկություն, ոչ թե զուտ տեսական եզրակացություն։</p></div>
+          </div>
+
+          <div class="card">
+            <h3>Հետազոտության արդյունավետության գնահատում</h3>
+            <p>Հետազոտության արդյունավետությունը ցույց է տալիս, թե որքանով է փաստացի ստացված արդյունքը համապատասխանում նպատակի փուլում ակնկալվող արդյունքին։ Պլանավորման փուլում հետազոտողը ձևավորում է հստակ պատկերացում ակնկալվող արդյունքի մասին, իսկ աշխատանքի ավարտից հետո այն համեմատում է փաստացի ստացվածի հետ։</p>
+            <p>Արդյունավետությունը ռեսուրսների ու արդյունքների միջև եղած հարաբերակցության գնահատականն է․ այն կապում է ամբողջ եռյակը՝ ռեսուրսներ, արդյունքներ և արդյունավետություն։ Արդյունավետությունը գնահատվում է երկու հարթությամբ։</p>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <h3>1. Քանակական գնահատում</h3>
+              <p>Գնահատվում է, թե որքան արդյունք է ստացվել ներդրված ռեսուրսի դիմաց։</p>
+              <p><strong>Օրինակ․</strong> մանրածախ ցանցը ծախսում է 3 միլիոն դրամ՝ հաճախորդների գնողական վարքագծի հետազոտության համար։ Հետազոտությունը ցույց է տալիս, որ խանութների դասավորությունը կարող է մեծացնել իմպուլսիվ գնումները։ Առաջարկվող փոփոխությունն իրականացնելու համար՝ դարակների վերադասավորում, նոր դիզայն և աշխատակիցների վերապատրաստում, անհրաժեշտ է ևս 7 միլիոն դրամ։ Ընդհանուր ներդրումը կազմում է 10 միլիոն դրամ։</p>
+              <p>Փոփոխությունից հետո վաճառքի ծավալն աճում է ամսական 8%-ով, որը տարեկան կտրվածքով կազմում է լրացուցիչ 60 միլիոն դրամ եկամուտ։ Արդյունավետությունը բարձր է, քանի որ ամբողջական ներդրումը զգալիորեն փոքր է ստացված նյութական արդյունքից։</p>
+            </div>
+            <div class="card">
+              <h3>2. Արժեքային գնահատում</h3>
+              <p>Գնահատվում է արդյունքի գործնական և գիտական նշանակությունը՝ անկախ ուղղակի քանակական հարաբերակցությունից։ Փոքր, բայց կազմակերպության համար կենսական հարցի պատասխանը կարող է ավելի արդյունավետ լինել, քան մեծածավալ, բայց քիչ կիրառելի հետազոտությունը։</p>
+              <p><strong>Օրինակ․</strong> դեղագործական ընկերության մատակարարման շղթայում պարզվում է, որ պահեստավորման ջերմաստիճանի 2–3 աստիճանի շեղումը կարող է վնասել դեղամիջոցների որակը։ Հետազոտությունը տևում է երկու շաբաթ և արժենում 1.5 միլիոն դրամ, սակայն դրա արդյունքում ներդրվող պարզ վերահսկողության մեխանիզմը կանխում է հնարավոր հսկայական ֆինանսական ու հեղինակային կորուստները։</p>
+              <p>Արժեքային տեսանկյունից հետազոտության նշանակությունը չափազանց բարձր է, թեև այն փոքրածավալ ու կետային է։ Ի հակադրություն՝ երկարատև ռազմավարական հետազոտությունը կարող է մեծածավալ լինել, բայց արդյունքներով մնալ ընդհանրական ու քիչ կիրառելի։</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="footer-note">Թեմա 1 · Կառավարման համակարգերի հետազոտության մեթոդաբանություն</div>
+      </div>
+
+<div id="topic2" class="topic-content" hidden>
+  <header class="hero">
+    <span class="hero-label">Թեմա 2 · Մեթոդաբանության հիմունքներ</span>
+    <h1>Կառավարման համակարգերի հետազոտության մեթոդաբանությունը</h1>
+    <p>
+      Թեմայում ներկայացվում են դիալեկտիկայի դերը, հետազոտական մեթոդների
+      դասակարգումը, մեթոդների ընտրության սկզբունքները, տրամաբանական ապարատը
+      և ընդհանուր գիտական ու հատուկ մեթոդները։
+    </p>
+  </header>
+
+  <section class="content-section" id="topic2-q4">
+    <div class="section-heading">
+      <div class="section-index">04</div>
+      <h2>Դիալեկտիկայի դերը կառավարման համակարգերի հետազոտության մեջ։ Կիրառման գործնական քայլերը</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>
+        Կառավարման համակարգերի հետազոտության հաջորդ քայլը հասկանալն է, թե ինչ
+        ընդհանուր փիլիսոփայական և մեթոդաբանական հիմքի վրա են կառուցվում
+        հետազոտության կոնկրետ մեթոդները։ Այս հիմքը կազմում են երկու
+        փոխլրացնող մոտեցումներ՝ <strong>դիալեկտիկան</strong> և արդեն ծանոթ
+        <strong>համակարգային մոտեցումը</strong>։ Առանց այս հիմքի հասկացողության,
+        ցանկացած կոնկրետ մեթոդի կիրառում՝ հարցում, վերլուծություն կամ
+        մոդելավորում, դառնում է մեխանիկական գործողություն՝ առանց խորը իմաստի
+        ընկալման։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Դիալեկտիկայի էությունը</h3>
+      <p>
+        Դիալեկտիկան գիտական ճանաչողության փիլիսոփայական մեթոդ է, որը
+        երևույթներն ուսումնասիրում է դրանց շարժման, զարգացման և փոխադարձ կապի
+        մեջ, այլ ոչ թե որպես անշարժ, մեկուսացված վիճակներ։ Մասնագիտական
+        գրականության մեջ դիալեկտիկան դիտարկվում է որպես գիտական հետազոտության
+        ամենալայն, ամենահամընդհանուր մեթոդ, որի ներքո գործում են մյուս
+        մեթոդները։
+      </p>
+      <p>
+        Եթե համակարգային մոտեցումն օգնում է տեսնել, թե ինչից է կազմված օբյեկտը
+        և ինչպես են դրա մասերը կապված իրար հետ, ապա դիալեկտիկան պատասխանում է
+        մեկ այլ հարցի՝ <strong>ինչո՞ւ և ինչպե՞ս է այդ օբյեկտը փոխվում ժամանակի
+        ընթացքում</strong>։
+      </p>
+      <p>
+        Ժամանակակից կառավարման հետազոտության մեջ դիալեկտիկան կիրառվում է ոչ թե
+        որպես գաղափարախոսական դոկտրինա, այլ որպես մեթոդաբանական գործիք՝
+        երևույթների զարգացումն ուսումնասիրելու համար։ Այն չի փոխարինում
+        կոնկրետ գործիքներին, այլ ապահովում է դրանց կիրառման ընդհանուր
+        փիլիսոփայական շրջանակը՝ ուղղորդելով հետազոտողի մտածողությունը դեպի
+        զարգացումն ու հակասությունների տրամաբանությունը։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Դիալեկտիկական մոտեցման երեք հիմնական օրենքները</h3>
+
+      <div class="callout">
+        <strong>1. Քանակական փոփոխությունների անցումը որակական փոփոխությունների</strong>
+        <p>
+          Աստիճանական, կուտակային փոփոխությունները որոշակի շեմից հետո հանգեցնում
+          են որակապես նոր վիճակի։ Կառավարման համակարգերում փոքր, աստիճանական
+          բարելավումները՝ վերապատրաստումները կամ տեխնոլոգիական թարմացումները,
+          կուտակվելով՝ կարող են հանգեցնել ամբողջական կազմակերպչական
+          վերափոխման։ Զարգացումը միշտ չէ, որ միայն աստիճանական է․ որոշակի
+          պահին տեղի է ունենում թռիչք, և համակարգը ձեռք է բերում նոր որակ։
+        </p>
+      </div>
+
+      <div class="callout">
+        <strong>2. Հակադրությունների միասնության և պայքարի օրենքը</strong>
+        <p>
+          Յուրաքանչյուր երևույթի կամ համակարգի ներսում գոյություն ունեն
+          հակադիր կողմեր, որոնք միաժամանակ փոխկապակցված են և հակամարտության
+          մեջ։ Համակարգի զարգացման ներքին աղբյուրը դրա ներսում եղած
+          հակասություններն են։ Կառավարման մեջ տարածված են կենտրոնացման և
+          ապակենտրոնացման, կայունության և փոփոխության, վերահսկողության և
+          ինքնավարության հակասությունները։ Երբ դրանք սրվում են, համակարգը
+          սկսում է փոխվել, վերակազմավորվել կամ անցնել զարգացման նոր փուլ։
+        </p>
+      </div>
+
+      <div class="callout">
+        <strong>3. Ժխտման ժխտման օրենքը</strong>
+        <p>
+          Զարգացումը տեղի է ունենում պարուրաձև, ոչ թե գծայնորեն․ նոր վիճակը
+          ժխտում է հինը, բայց իր մեջ պահպանում է դրա դրական տարրերը՝ ավելի
+          բարձր մակարդակում։
+        </p>
+        <p>
+          Օրինակ՝ ավանդական, բազմաստիճան հիերարխիկ կազմակերպական կառուցվածքը
+          (Ա) փոխարինվում է «հարթ» կառուցվածքով (Բ), որտեղ վերացվում են
+          միջանկյալ կառավարման օղակները՝ որոշումների կայացումն արագացնելու
+          համար։ Աճի հետ մեկտեղ կարող է առաջանալ համակարգման ու վերահսկողության
+          պակաս, և ընկերությունն անցնի մատրիցային կառուցվածքի (Գ)։ Այն
+          պահպանում է հարթ կառուցվածքի ճկունությունը նախագծերում, բայց
+          վերականգնում է հաշվետվողականության հստակ գծերը։
+        </p>
+      </div>
+
+      <p style="margin-top:15px">
+        Այս օրենքները հուշում են, որ հետազոտողը փոփոխությունը չպետք է
+        դիտարկի որպես պարզ, գծային անցում մեկ վիճակից մյուսը․ այն բարդ և հաճախ
+        ցիկլային գործընթաց է։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Դիալեկտիկական մոտեցման մեթոդաբանական սկզբունքները</h3>
+      <ul class="bullet-list">
+        <li><strong>Օբյեկտիվության սկզբունք</strong> — երևույթը պետք է ուսումնասիրվի այնպիսին, ինչպիսին կա՝ առանց նախապես ձևավորված պատկերացումներ պարտադրելու։</li>
+        <li><strong>Ամբողջականության և կապվածության սկզբունք</strong> — երևույթը դիտարկվում է իր բոլոր կապերի համակցության մեջ։ Սա դիալեկտիկան կապում է համակարգային մոտեցման հետ։</li>
+        <li><strong>Զարգացման սկզբունք</strong> — կառավարման համակարգը երբեք վերջնական, ավարտված վիճակում չէ․ քանակական կուտակումները կարող են հանգեցնել որակական փոփոխությունների։</li>
+        <li><strong>Հակասությունների բացահայտման սկզբունք</strong> — կառավարման խնդրի հետազոտությունը սկսվում է հակասության հայտնաբերումից։</li>
+        <li><strong>Կոնկրետության սկզբունք</strong> — սկզբունքները կիրառվում են կոնկրետ պատմական ու կազմակերպչական համատեքստում, ոչ թե վերացականորեն։</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Դիալեկտիկայի և համակարգային մոտեցման փոխլրացումը</h3>
+      <p>
+        Դիալեկտիկան և համակարգային մոտեցումը չեն հակասում միմյանց, այլ
+        լրացնում են իրար։ Համակարգային մոտեցումն ապահովում է կառուցվածքային
+        «լուսանկարը»՝ ինչպիսի՞ն է համակարգը տվյալ պահին, ինչ տարրերից է կազմված
+        և ինչպես են դրանք կապված։ Դիալեկտիկան ապահովում է ժամանակային
+        «տեսանյութը»՝ ինչպես է այդ կառուցվածքը փոխվել անցյալում և ինչ
+        ուղղությամբ է շարժվում ապագայում։
+      </p>
+      <p>
+        Լիարժեք հետազոտությունը պահանջում է երկու մոտեցումն էլ․ միայն
+        կառուցվածքի նկարագրությունը թերի է՝ առանց հասկանալու, թե ինչու է այն
+        ձևավորվել և ուր է շարժվում։ Միայն զարգացման դինամիկան նկարագրելն էլ
+        թերի է՝ առանց տվյալ պահի կառուցվածքը հասկանալու։
+      </p>
+    </div>
+
+    <div class="example-grid">
+      <div class="example-card">
+        <div class="icon">🏢</div>
+        <p>
+          Ընկերության կառուցվածքն ուսումնասիրելիս համակարգային մոտեցումը ցույց
+          է տալիս բաժինները, պաշտոններն ու ենթակայության գծերը։ Դիալեկտիկան
+          օգնում է հասկանալ, թե ինչ հակասություններ են հանգեցրել այդ
+          կառուցվածքին և ինչ նոր հակասություններ են կուտակվում։
+        </p>
+      </div>
+      <div class="example-card">
+        <div class="icon">📱</div>
+        <p>
+          Հեռահաղորդակցության ընկերությունում հաշվետվության համակարգի,
+          CRM-ի և ավտոմատացված վճարումների աստիճանական ներդրումը կարող է
+          որոշակի պահից հանգեցնել որակապես նոր՝ ամբողջական թվային
+          բիզնես-մոդելի։
+        </p>
+      </div>
+      <div class="example-card">
+        <div class="icon">🏛️</div>
+        <p>
+          Պետական կառավարման բարեփոխման ժամանակ կենտրոնացված համակարգը
+          փոխարինվում է ապակենտրոնացմամբ, իսկ համակարգման խնդիրների
+          առաջացումից հետո կարող է ձևավորվել «խելացի կենտրոնացում», որը
+          համադրում է երկու մոտեցումների առավելությունները։
+        </p>
+      </div>
+    </div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում և հետևանք</strong>
+      <p>
+        Հետազոտողը ընկերության ընթացիկ կառուցվածքը նկարագրում է որպես վերջնական,
+        կայուն և անփոփոխ փաստ՝ չուսումնասիրելով, թե ինչու է այն ձևավորվել և
+        ինչ ուղղությամբ է շարժվում։ Եզրակացությունները դառնում են ստատիկ
+        «լուսանկար» և կորցնում արժեքը, երբ ներքին հակասությունները բերում են
+        կառուցվածքի փոփոխության։ Հետազոտությունը չի կարողանում կանխատեսել կամ
+        բացատրել փոփոխությունը, քանի որ դիտարկել է միայն մեկ «սառեցված» պահը։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Դիալեկտիկայի կիրառման գործնական քայլերը</h3>
+      <ol class="number-list">
+        <li><strong>Ֆիքսել համակարգի ընթացիկ վիճակը</strong> — նկարագրել կառուցվածքը, տարրերն ու կապերը՝ համակարգային մոտեցման գործիքներով։</li>
+        <li><strong>Վերականգնել զարգացման նախապատմությունը</strong> — հասկանալ, թե ինչ վիճակից և ինչ ճանապարհով է համակարգը հասել ներկայիս վիճակին, և ինչ որոշումներ կամ իրադարձություններ են ազդել դրա վրա։</li>
+        <li><strong>Բացահայտել ներքին հակասությունները</strong> — գտնել համակարգի ներսում գործող լարվածությունները, օրինակ՝ արագ աճի և կառավարման կարողությունների սահմանափակության միջև։</li>
+        <li><strong>Գնահատել հակասությունների հասունությունը</strong> — որոշել՝ որքանով են դրանք մոտեցել քանակականից որակական փոփոխության շեմին, և ինչ ազդանշաններ կան առաջիկա փոփոխության մասին։</li>
+        <li><strong>Կանխատեսել զարգացման սցենարները</strong> — ձևակերպել համակարգի հնարավոր հաջորդ վիճակը և նշել, թե նախորդ վիճակի դրական տարրերից որոնք կարող են պահպանվել։</li>
+      </ol>
+      <div class="callout good">
+        <strong>Օրինակ՝ համալսարանի կառավարման համակարգ</strong>
+        <p>
+          Նախ նկարագրվում է կառավարման ներկա կառուցվածքը՝ ռեկտորատը,
+          դեկանատներն ու ամբիոնները։ Այնուհետև վերականգնվում է դրա ձևավորման
+          պատմությունը՝ կենտրոնացված մոդելից դեպի ինքնավարություն անցումը,
+          բացահայտվում է ակադեմիական ազատության և ֆինանսական
+          հաշվետվողականության հակասությունը, ապա կանխատեսվում է համակարգի
+          հնարավոր հետագա զարգացումը։
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic2-q5">
+    <div class="section-heading">
+      <div class="section-index">05</div>
+      <h2>Կառավարման համակարգերի ուսումնասիրման մեթոդների դասակարգումը</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>
+        Մեթոդների ճիշտ դասակարգումն օգնում է հետազոտողին կողմնորոշվել բազմաթիվ
+        գործիքների մեջ և գիտակցաբար ընտրել կոնկրետ խնդրին համապատասխան մեթոդը՝
+        պատահականորեն կամ սովորության ուժով առաջին հանդիպած գործիքն
+        օգտագործելու փոխարեն։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Դասակարգումն ըստ ընդհանրության աստիճանի</h3>
+      <p>
+        Կիրառության շրջանակի լայնության հիման վրա մեթոդները բաժանվում են երեք
+        իրար հետ հիերարխիկորեն կապված մակարդակի։
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Մակարդակ</th><th>Նկարագրություն</th><th>Օրինակներ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Համընդհանուր (փիլիսոփայական)</strong></td>
+              <td>Կիրառելի են ցանկացած գիտության և ցանկացած օբյեկտի ուսումնասիրության ժամանակ։ Տալիս են ընդհանուր ուղղություն, ոչ թե կոնկրետ գործիքներ։</td>
+              <td>Դիալեկտիկա և դրանից բխող մոտեցումներ։</td>
+            </tr>
+            <tr>
+              <td><strong>Ընդհանուր գիտական</strong></td>
+              <td>Կիրառվում են բազմաթիվ գիտություններում։ Կազմում են գիտական հետազոտության ընդհանուր գործիքակազմը։</td>
+              <td>Վերլուծություն և սինթեզ, ինդուկցիա և դեդուկցիա, համեմատություն, մոդելավորում, համակարգային մոտեցում։</td>
+            </tr>
+            <tr>
+              <td><strong>Հատուկ (մասնավոր)</strong></td>
+              <td>Բնորոշ են կոնկրետ գիտության կամ նեղ ոլորտի։ Պահանջում են մասնագիտական գիտելիքներ ու հմտություններ։</td>
+              <td>SWOT-վերլուծություն, ֆինանսական վերլուծություն, սոցիոլոգիական հարցում, փորձագիտական գնահատում։</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <p>
+          Յուրաքանչյուր ցածր մակարդակ վերևի մակարդակի ընդհանուր տրամաբանությունը
+          հարմարեցնում է ավելի նեղ ոլորտին։
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Դասակարգումն ըստ գիտական ճանաչողության մակարդակի</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Մեթոդների խումբ</th><th>Նպատակ և մեթոդներ</th><th>Արդյունք</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Էմպիրիկ մեթոդներ</strong></td>
+              <td>Փաստերի և տվյալների ուղղակի հավաքագրում՝ դիտարկում, հարցում, փաստաթղթերի ուսումնասիրություն, գիտափորձ։</td>
+              <td>Առաջնային տվյալներ։</td>
+            </tr>
+            <tr>
+              <td><strong>Համընդհանուր գիտական մեթոդներ</strong></td>
+              <td>Կիրառվում են էմպիրիկ և տեսական մակարդակներում՝ վերլուծություն և սինթեզ, ինդուկցիա և դեդուկցիա, պատմական և տրամաբանական մեթոդներ։</td>
+              <td>Տվյալների համակարգում, ընդհանրացում և մեկնաբանություն։</td>
+            </tr>
+            <tr>
+              <td><strong>Տեսական մեթոդներ</strong></td>
+              <td>Փաստերի վերլուծություն, մեկնաբանում և ընդհանրացում՝ վերացարկում, ֆորմալացում, մոդելավորում, աքսիոմատիկ մեթոդ։</td>
+              <td>Մոդելներ, տեսություններ և օրինաչափություններ։</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px">
+        Էմպիրիկ մեթոդները ձևավորում են փաստական հիմքը, համընդհանուր գիտական
+        մեթոդները՝ ապահովում տվյալների վերլուծությունն ու ընդհանրացումը, իսկ
+        տեսական մեթոդները՝ գիտական բացատրությունների և մոդելների կառուցումը։
+        Գիտական հետազոտության մեջ այս խմբերը կիրառվում են փոխկապակցված։
+      </p>
+      <div class="callout good">
+        <strong>Օրինակներ</strong>
+        <p>
+          Անձնակազմի ընտրության հետազոտության ժամանակ թեկնածուների
+          հարցազրույցների ձայնագրումն ու սղագրումը էմպիրիկ քայլ է, իսկ
+          սղագրություններից հաջողված աշխատակցի ընդհանրացված «պրոֆիլի»
+          կառուցումը՝ տեսական։
+        </p>
+        <p style="margin-top:8px">
+          Մատակարարման շղթայի ուսումնասիրության ժամանակ պատմական մեթոդով
+          վերլուծվում է շղթայի ձևավորումն ու փոփոխությունը՝ առաքումների
+          ժամանակացույցերը համադրելով մատակարարման ցանցերի տեսության
+          սկզբունքների հետ։
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Դասակարգումն ըստ հետազոտության գործառական նշանակության</h3>
+      <p>
+        Կիրառական կառավարչական հետազոտություններում մեթոդները կարելի է
+        դասակարգել նաև ըստ այն գործառույթի, որը կատարում են։
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Մեթոդների խումբ</th><th>Հիմնական հարցը</th><th>Նպատակ և օրինակներ</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Ախտորոշիչ</strong></td>
+              <td>Ինչո՞ւ է առաջացել խնդիրը։</td>
+              <td>Բացահայտել խնդրի բնույթը, պատճառներն ու պայմանները։ Օրինակ՝ պատճառահետևանքային վերլուծություն, «5 ինչու» մեթոդ, արմատական պատճառների վերլուծություն (Root Cause Analysis)։</td>
+            </tr>
+            <tr>
+              <td><strong>Կանխատեսող</strong></td>
+              <td>Ի՞նչ տեղի կունենա, եթե ոչինչ չփոխվի։</td>
+              <td>Գնահատել ապագա միտումները, ռիսկերն ու սցենարները։ Օրինակ՝ ժամանակային շարքերի վերլուծություն, սցենարային պլանավորում, էքստրապոլյացիա։</td>
+            </tr>
+            <tr>
+              <td><strong>Նախագծային կամ որոշումների մշակման</strong></td>
+              <td>Ի՞նչ պետք է անել խնդիրը լուծելու համար։</td>
+              <td>Մշակել լուծումներ ու գործողությունների ծրագրեր։ Օրինակ՝ բիզնես-գործընթացների վերանախագծում, ռազմավարական պլանավորում, այլընտրանքների բազմաչափ գնահատում և օպտիմալացում։</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px">
+        Լիարժեք կառավարչական հետազոտությունը սովորաբար անցնում է երեք փուլով՝
+        նախ խնդրի ախտորոշում, ապա դրա հետագա զարգացման կանխատեսում և վերջում՝
+        լուծումների առաջարկում։ Եթե ախտորոշումը բաց է թողնվում, առաջարկները
+        կարող են ուղղված լինել ոչ թե իրական պատճառին, այլ խնդրի մակերեսային
+        դրսևորմանը։
+      </p>
+    </div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում</strong>
+      <p>
+        Խորհրդատվական խումբը, բաց թողնելով ախտորոշումը, անմիջապես առաջարկում է
+        վաճառողների վերապատրաստում և նոր մոտիվացիոն համակարգ՝ հիմնվելով
+        «լավագույն փորձի» ընդհանուր պատկերացումների վրա։ Եթե իրական խնդիրը
+        մատակարարման խափանումներն են, առաջարկությունները չեն լուծի այն, և
+        ներդրված ռեսուրսները չեն տա ակնկալվող արդյունքը։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>«5 ինչու» մեթոդի օրինակ</h3>
+      <ol class="number-list">
+        <li><strong>Ինչո՞ւ է նվազել վաճառքների ծավալը։</strong> Հաճախորդների բավարարվածությունը նվազել է։</li>
+        <li><strong>Ինչո՞ւ է նվազել բավարարվածությունը։</strong> Պատվերների առաքման ժամկետները հաճախ խախտվում են։</li>
+        <li><strong>Ինչո՞ւ են խախտվում առաքման ժամկետները։</strong> Պահեստում ապրանքների վերաբերյալ տվյալները հաճախ ոչ ճշգրիտ են։</li>
+        <li><strong>Ինչո՞ւ են պահեստի տվյալները ոչ ճշգրիտ։</strong> Պաշարների հաշվառումն իրականացվում է ձեռքով՝ առանց ավտոմատացված համակարգի։</li>
+        <li><strong>Ինչո՞ւ չկա ավտոմատացված համակարգ։</strong> Ընկերությունը դեռ չի ներդրել պաշարների կառավարման ծրագրային լուծում։</li>
+      </ol>
+      <p>
+        Հինգերորդ պատասխանը՝ ավտոմատացված համակարգի բացակայությունը,
+        արմատական պատճառն է, մինչդեռ վաճառքների անկումը միայն ախտանիշն էր։
+        «5» թիվը պայմանական է․ հարցերի քանակը կարող է փոխվել՝ կախված նրանից,
+        թե երբ է հայտնաբերվում իրական պատճառը։
+      </p>
+    </div>
+
+    <div class="example-grid">
+      <div class="example-card"><div class="icon">📊</div><p>Շուկայական դիրքի հետազոտության ժամանակ կիրառվում են ընդհանուր գիտական համեմատական վերլուծությունը և հատուկ SWOT-վերլուծությունը։</p></div>
+      <div class="example-card"><div class="icon">🏦</div><p>Բանկային ռիսկերի հետազոտության էմպիրիկ փուլում հավաքագրվում են վարկային պորտֆելի տվյալները, իսկ տեսական փուլում կառուցվում է ռիսկերի կանխատեսման մոդել։</p></div>
+      <div class="example-card"><div class="icon">🏛️</div><p>Հանրային կառավարման բարեփոխման հետազոտության մեջ քաղաքականության վերլուծությունը հատուկ մեթոդ է, որի հիմքում կարող է լինել ընդհանուր գիտական համեմատական մեթոդը։</p></div>
+    </div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում և հետևանք</strong>
+      <p>
+        Միայն մեկ նեղ մեթոդ, օրինակ՝ ֆինանսական հարաբերակցությունների հաշվարկ,
+        կիրառելը՝ առանց համեմատության կամ մոդելավորման, տալիս է ճշգրիտ, բայց
+        մեկուսացված թվեր։ Դրանք չեն կապվում կազմակերպության ընդհանուր
+        զարգացման տրամաբանության հետ, ուստի եզրակացությունները մնում են
+        մակերեսային։
+      </p>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic2-q6">
+    <div class="section-heading">
+      <div class="section-index">06</div>
+      <h2>Հետազոտությունների դիվերսիֆիկացումը</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>
+        Ժամանակակից կառավարման համակարգերի հետազոտության մեջ նկատվում է
+        <strong>դիվերսիֆիկացման</strong> կայուն միտում՝ հետազոտության տեսակների,
+        մեթոդների ու մոտեցումների բազմազանեցում։ Եթե նախկինում գերակշռում էին
+        զուտ քանակական կամ զուտ որակական հետազոտությունները, ապա այսօր
+        հետազոտողները հաճախ համադրում են տարբեր տրամաբանություններ՝ առավել
+        ամբողջական պատկեր ստանալու համար։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Դիվերսիֆիկացման հիմնական ուղղությունները</h3>
+      <ul class="bullet-list">
+        <li><strong>Ըստ մեթոդաբանական տրամաբանության</strong> — կիրառվում են որակական, քանակական և խառը մեթոդներ, որոնք նույն օբյեկտն ուսումնասիրում են տարբեր տեսանկյուններից։</li>
+        <li><strong>Ըստ տվյալների աղբյուրների</strong> — առաջնային տվյալները՝ հարցումներ ու հարցազրույցներ, զուգակցվում են երկրորդային տվյալների՝ վիճակագրական հաշվետվությունների, փաստաթղթերի ու նախորդ հետազոտությունների հետ։</li>
+        <li><strong>Ըստ վերլուծական գործիքակազմի</strong> — ավանդական վիճակագրությունից անցում է կատարվում համակարգչային մոդելավորման, մեծ տվյալների (Big Data) ու ցանցային վերլուծության։</li>
+        <li><strong>Ըստ մասնագիտական ոլորտների ինտեգրման</strong> — կառավարման հետազոտությունը ներգրավում է հոգեբանության, սոցիոլոգիայի և ինֆորմատիկայի գործիքակազմը։</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Եռանկյունաչափում (triangulation)</h3>
+      <p>
+        Դիվերսիֆիկացման հիմնական նպատակն է հաղթահարել մեկ մեթոդի
+        սահմանափակումները և բարձրացնել հետազոտության հավաստիությունը
+        եռանկյունաչափման սկզբունքով։ Միևնույն երևույթը ուսումնասիրվում կամ
+        հաստատվում է մի քանի անկախ մեթոդներով ստացված արդյունքների միջոցով։
+      </p>
+      <p>
+        Սա հատկապես կարևոր է պատասխանատու կառավարչական որոշումների դեպքում․
+        որքան շատ անկախ աղբյուրներ են հաստատում նույն եզրակացությունը, այնքան
+        մեծ է դրա նկատմամբ վստահությունը։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Դիվերսիֆիկացված մեթոդների կիրառման օրինակներ</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Կառավարման ոլորտ</th><th>Դիվերսիֆիկացված մեթոդների օրինակ</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Կադրային կառավարում</strong></td><td>Հարցումներ (քանակական) + ելքի հարցազրույցներ (որակական) + անձնակազմի հոսքի վիճակագրություն (երկրորդային)։</td></tr>
+            <tr><td><strong>Ֆինանսական կառավարում</strong></td><td>Ֆինանսական հաշվետվությունների վերլուծություն + փորձագիտական հարցում + ոլորտային համեմատություն։</td></tr>
+            <tr><td><strong>Մարքեթինգ</strong></td><td>Հաճախորդների հարցում + ֆոկուս խմբեր + սոցիալական մեդիայի վերլուծություն։</td></tr>
+            <tr><td><strong>Գործառնական կառավարում</strong></td><td>Գործընթացների ժամանակագրում (քանակական) + աշխատակիցների դիտարկում (որակական)։</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="example-grid">
+      <div class="example-card"><div class="icon">⭐</div><p>Հաճախորդների գոհունակությունը չափվում է քանակական հարցմամբ, խորքային հարցազրույցներով բացահայտվում են դժգոհության պատճառները, իսկ սոցիալական մեդիայի վերլուծությամբ ստուգվում է՝ արդյոք հանրային քննարկումները համապատասխանում են հարցման արդյունքներին։</p></div>
+      <div class="example-card"><div class="icon">🏢</div><p>Կազմակերպչական մշակույթը ուսումնասիրվում է աշխատակիցների հարցմամբ, ղեկավարների հետ խորքային հարցազրույցներով և ներքին փաստաթղթերի վերլուծությամբ։</p></div>
+      <div class="example-card"><div class="icon">🛍️</div><p>Ապրանքանիշի ընկալման համար համադրվում են վաճառքի վիճակագրությունը, ֆոկուս խմբերի քննարկումները և մրցակիցների գովազդային ռազմավարությունների վերլուծությունը։</p></div>
+    </div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում</strong>
+      <p>
+        Հետազոտողը սահմանափակվում է միայն մեկ տեսակի տվյալով, օրինակ՝
+        ղեկավարության պաշտոնական հայտարարություններով, և անտեսում
+        աշխատակիցների կարծիքներն ու արտաքին դիտորդների գնահատականները։
+        Հետազոտությունը դառնում է միակողմանի և կարող է չդիմանալ այլ
+        աղբյուրներով ստուգմանը։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Դիվերսիֆիկացման սահմանափակումները</h3>
+      <p>
+        Մեթոդների ու տվյալների աղբյուրների բազմազանեցումը մեծացնում է
+        ժամանակային և ֆինանսական ծախսերը և պահանջում է տիրապետել մի քանի
+        մեթոդաբանական ավանդույթների։ Տարբեր մեթոդներով ստացված, հատկապես
+        իրար հակասող արդյունքների համադրումը պահանջում է լրացուցիչ վերլուծական
+        աշխատանք ու փորձառություն։
+      </p>
+      <p>
+        Ուստի դիվերսիֆիկացման աստիճանը պետք է համապատասխանի հետազոտության
+        մասշտաբին և կարևորությանը․ մեծ ու պատասխանատու հետազոտությունների
+        համար արդարացված է լայն դիվերսիֆիկացումը, իսկ փոքր և օպերատիվ
+        հետազոտությունների դեպքում կարող է բավարար լինել մեկ կամ երկու մեթոդ։
+      </p>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic2-q7">
+    <div class="section-heading">
+      <div class="section-index">07</div>
+      <h2>Հետազոտության մեթոդների ընտրությունը, զուգակցումը և համադրությունը</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>
+        Մեթոդների ընտրությունը հետազոտության պլանավորման կենտրոնական
+        խնդիրներից է․ սխալ ընտրված մեթոդը կարող է արժեզրկել նույնիսկ լավ
+        ձևակերպված հետազոտական հարցը։ Ընտրությունը պետք է բխի հետազոտական
+        հարցից, ոչ թե հետազոտողի սովորությունից։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Մեթոդի ընտրության հիմնական չափանիշները</h3>
+      <ol class="number-list">
+        <li>
+          <strong>Հետազոտական հարցի բնույթը.</strong>
+          եթե հարցը վերաբերում է տարածվածությանն ու չափելի ցուցանիշներին՝
+          «քանի՞ տոկոս», հարմար են քանակական մեթոդները։ Եթե հարցը վերաբերում է
+          իմաստներին ու փորձառությանը՝ «ինչո՞ւ», «ինչպե՞ս են ընկալում»,
+          հարմար են որակական մեթոդները։
+        </li>
+        <li>
+          <strong>Հասանելի ռեսուրսները.</strong>
+          հաշվի են առնվում ժամանակը, բյուջեն և տվյալների աղբյուրներին հասանելիությունը։
+          Եթե խորը հարցազրույցների համար կա ընդամենը մեկ շաբաթ և մասնակիցները
+          սահմանափակ են, հնարավոր է՝ անհրաժեշտ լինի վերանայել մեթոդաբանական պլանը։
+        </li>
+        <li>
+          <strong>Հետազոտության ընդգրկման աստիճանը.</strong>
+          ամբողջ գլխավոր համախմբության վերաբերյալ ընդհանրացվող եզրակացությունների
+          համար անհրաժեշտ է պատշաճ ընտրանքով քանակական մեթոդ։ Կոնկրետ դեպքերի
+          խորքային հասկացման համար կարող է բավարար լինել փոքր, նպատակային ընտրանքը։
+        </li>
+        <li>
+          <strong>Հետազոտողի փորձառությունը.</strong>
+          տեսական իմացությունը բավարար չէ։ Հարցազրույցի կամ վիճակագրական
+          մոդելավորման որակը մեծապես կախված է գործնական փորձից։
+        </li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>Մեթոդի ընտրության գործնական ստուգաթերթ</h3>
+      <ol class="number-list">
+        <li>Հարցը սկսվում է «քանի՞», «ինչքա՞ն», «ինչպիսի՞ հաճախականությամբ» բառերով, թե՞ «ինչո՞ւ», «ինչպե՞ս է ընկալվում», «ինչ իմաստ ունի» արտահայտություններով։</li>
+        <li>Հասանելի է ամբողջ գլխավոր համախմբությո՞ւնը, թե՞ միայն սահմանափակ թվով մասնակիցներ, որոնց հետ հնարավոր է խորը շփում ունենալ։</li>
+        <li>Կա՞ն թեմային վերաբերող նախկինում իրականացված հավաստի հարցաթերթեր, թե՞ անհրաժեշտ է նախ ուսումնասիրել երևույթի բնույթը։</li>
+        <li>Որքա՞ն ժամանակ և բյուջե է հատկացված, և արդյոք դա բավարար է ընտրված մեթոդն ամբողջությամբ իրականացնելու համար։</li>
+        <li>Արդյունքները պե՞տք է վիճակագրորեն ընդհանրացվեն ամբողջ համախմբության համար, թե՞ բավարար է կոնկրետ դեպքերի խորքային հասկացումը։</li>
+      </ol>
+      <div class="callout good">
+        <p>
+          Այս հարցերին պատասխանելը օգնում է խուսափել մեթոդի պատահական
+          ընտրությունից և գտնել հետազոտական հարցին համապատասխանող
+          մեթոդաբանական լուծումը։
+        </p>
+      </div>
+    </div>
+
+<div class="question-method-diagram">
+  <div class="qmd-title">
+    <strong>Հետազոտական հարցի բնույթը</strong>
+    <span>Ի՞նչ է ուզում իմանալ հետազոտողը</span>
+  </div>
+
+  <div class="qmd-branches">
+    <div class="qmd-branch quantitative">
+      <div class="qmd-box">
+        <strong>«Ինչքա՞ն, քանի՞»</strong>
+        <span>Չափելի, թվային ցուցանիշների որոնում</span>
+      </div>
+      <div class="qmd-arrow">↓</div>
+      <div class="qmd-box">
+        <strong>Քանակական մեթոդներ</strong>
+        <span>Հարցում, վիճակագրական վերլուծություն</span>
+      </div>
+    </div>
+
+    <div class="qmd-branch qualitative">
+      <div class="qmd-box">
+        <strong>«Ինչո՞ւ, ինչպե՞ս»</strong>
+        <span>Երևույթի բովանդակային մեկնաբանության որոնում</span>
+      </div>
+      <div class="qmd-arrow">↓</div>
+      <div class="qmd-box">
+        <strong>Որակական մեթոդներ</strong>
+        <span>Հարցազրույց, դիտարկում, փաստաթղթերի վերլուծություն</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="qmd-caption">
+    Հետազոտողը սկզբում սահմանում է հարցի բնույթը, ապա ընտրում դրան
+    համապատասխան մեթոդները։
+  </div>
+</div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում և հետևանք</strong>
+      <p>
+        Ուսանողն ընտրում է հարցումը, որովհետև «այն ամենադյուրինն է
+        իրականացնել», թեև հետազոտական հարցը՝ «ինչո՞ւ են աշխատակիցները դիմադրում
+        կազմակերպչական փոփոխություններին», պահանջում է որակական, խորքային
+        մոտեցում։ Փակ հարցերի տոկոսները չեն բացահայտում դիմադրության
+        բազմաշերտ պատճառները, և հետազոտությունը սահմանափակվում է մակերեսային
+        նկարագրությամբ։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Մեթոդների զուգակցման ձևերը</h3>
+      <p>Երբ մեկ մեթոդը բավարար չէ խնդիրը լիարժեք լուծելու համար, մեթոդները կարելի է զուգակցել հետևյալ ձևերով։</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ձև</th><th>Բացատրություն</th><th>Օրինակ</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Հաջորդական (sequential)</strong></td>
+              <td>Նախ իրականացվում է մեկ մեթոդ, ապա՝ մյուսը՝ առաջինի արդյունքների հիման վրա։</td>
+              <td>Նախ որակական հետազոտությամբ ձևավորվում են վարկածներ, ապա քանակական հարցմամբ դրանք ստուգվում են։</td>
+            </tr>
+            <tr>
+              <td><strong>Զուգահեռ (concurrent)</strong></td>
+              <td>Երկու մեթոդներն իրականացվում են միաժամանակ ու անկախ, ապա արդյունքները համադրվում են։</td>
+              <td>Միաժամանակ անցկացվում են լայնածավալ հարցում և փորձագիտական ֆոկուս խումբ։</td>
+            </tr>
+            <tr>
+              <td><strong>Ներդրված (embedded)</strong></td>
+              <td>Մեկ մեթոդը հիմնականն է, իսկ մյուսը ներդրվում է որպես լրացուցիչ՝ խորքային մեկնաբանություն տալու համար։</td>
+              <td>Հարցման մեջ ներառվում են մի քանի խորքային հարցազրույցներ։</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="example-grid">
+      <div class="example-card"><div class="icon">👥</div><p><strong>Հաջորդական օրինակ.</strong> Աշխատակիցների հեռացման պատճառները հասկանալու համար նախ անցկացվում են խորքային հարցազրույցներ, ապա դրանց հիման վրա կազմված հարցաթերթով հարցում է անցկացվում ամբողջ անձնակազմում։</p></div>
+      <div class="example-card"><div class="icon">🏛️</div><p><strong>Զուգահեռ օրինակ.</strong> Հանրային ծառայությունների գնահատման ժամանակ միաժամանակ անցկացվում են քաղաքացիների լայն հարցում և փորձագետների ֆոկուս քննարկում, իսկ արդյունքները համադրվում են։</p></div>
+      <div class="example-card"><div class="icon">🏥</div><p><strong>Ներդրված օրինակ.</strong> Հիվանդների բավարարվածության հիմնական հարցման մեջ ներառվում են մի քանի խորքային հարցազրույցներ՝ ամենաբարձր և ամենացածր գնահատականները տված հիվանդների հետ։</p></div>
+    </div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում</strong>
+      <p>
+        Հետազոտողը մեթոդն ընտրում է սեփական հարմարավետությունից կամ սովորությունից՝
+        անկախ հետազոտական հարցից։ Եթե «ինչո՞ւ են աշխատակիցները դիմադրում
+        փոփոխություններին» հարցին պատասխանում են միայն քանակական հարցմամբ,
+        կարող են ստացվել ճշգրիտ թվեր, օրինակ՝ «68%-ը դժգոհ է», բայց ոչ այն
+        հասկացողությունը, թե ինչու է դա տեղի ունենում։
+      </p>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic2-q8">
+    <div class="section-heading">
+      <div class="section-index">08</div>
+      <h2>Կառավարման համակարգերի ուսումնասիրության տրամաբանական ապարատը։ Ինդուկցիա և դեդուկցիա</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>
+        Ցանկացած գիտական հետազոտություն, անկախ կիրառվող մեթոդից, հենվում է
+        տրամաբանության ընդհանուր օրենքների ու կանոնների վրա, որոնք ապահովում են
+        դատողությունների հետևողականությունն ու հիմնավորվածությունը։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Տրամաբանական ապարատի հիմնական տարրերը</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Տարր</th><th>Բացատրություն</th><th>Օրինակ</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Հասկացություն</strong></td><td>Մտածողության ձև, որն արտացոլում է օբյեկտի էական հատկանիշները։</td><td>«Կառավարման արդյունավետություն» հասկացության հստակ սահմանումը հետազոտության սկզբում։</td></tr>
+            <tr><td><strong>Դատողություն</strong></td><td>Մտքի ձև, որով ինչ-որ բան հաստատվում կամ ժխտվում է հասկացության վերաբերյալ։</td><td>«Կազմակերպության արդյունավետությունը բարձրացել է»։</td></tr>
+            <tr><td><strong>Հետևություն</strong></td><td>Մեկ կամ մի քանի նախադրյալներից տրամաբանորեն նոր դատողություն ստանալու գործընթաց։</td><td>Մի քանի փաստերի հիման վրա եզրակացություն անել համակարգի աշխատանքի մասին։</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Ինդուկցիա և դեդուկցիա</h3>
+      <p>
+        Հետազոտության տրամաբանական ապարատի կիրառման երկու հիմնական ուղղություններն
+        են <strong>ինդուկցիան</strong> և <strong>դեդուկցիան</strong>։
+      </p>
+      <ul class="bullet-list">
+        <li><strong>Ինդուկցիա</strong> — մասնավոր փաստերից անցում դեպի ընդհանուր օրինաչափություն։</li>
+        <li><strong>Դեդուկցիա</strong> — ընդհանուր օրենքից անցում դեպի կոնկրետ եզրակացություն կամ ստուգելի կանխատեսում։</li>
+      </ul>
+      <p>
+        Կառավարման համակարգերի հետազոտության մեջ դրանք մշտապես գործում են
+        համատեղ՝ որպես ցիկլ։ Դիտարկումների հիման վրա հետազոտողը ինդուկտիվորեն
+        ձևակերպում է վարկած, ապա այդ վարկածից դեդուկտիվորեն բխեցնում է
+        ստուգելի կանխատեսումներ։ Դրանց ստուգումը տալիս է նոր դիտարկումներ,
+        և գործընթացը կրկնվում է։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Տրամաբանության հիմնական օրենքները</h3>
+      <ol class="number-list">
+        <li><strong>Նույնության օրենք</strong> — յուրաքանչյուր հասկացություն կամ միտք հետազոտության ընթացքում պետք է պահպանի նույն, հստակ իմաստը։</li>
+        <li><strong>Հակասության օրենք</strong> — երկու հակադիր դատողություններ միաժամանակ չեն կարող ճշմարիտ լինել։ Եզրակացությունները չպետք է ինքնահակասական լինեն։</li>
+        <li><strong>Բացառված երրորդի օրենք</strong> — երկու իրար հակասող դատողություններից մեկը ճշմարիտ է, մյուսը՝ կեղծ․ երրորդ տարբերակ չկա։</li>
+        <li><strong>Բավարար հիմքի օրենք</strong> — յուրաքանչյուր պնդում պետք է ունենա տրամաբանական հիմք և հիմնավորված լինի փաստերով կամ ապացուցված դատողություններով։</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>Տրամաբանական օրենքների կիրառման օրինակ</h3>
+      <p>
+        Ենթադրենք՝ հետազոտողն ուսումնասիրում է՝ արդյոք հեռավար աշխատանքն
+        ազդում է թիմային համախմբվածության վրա։
+      </p>
+      <ul class="bullet-list">
+        <li><strong>Նույնության օրենքը</strong> պահանջում է «թիմային համախմբվածություն» հասկացության հստակ սահմանում և դրա նույն իմաստի պահպանում ամբողջ հետազոտության ընթացքում։</li>
+        <li><strong>Հակասության օրենքը</strong> թույլ չի տալիս միաժամանակ պնդել, որ հեռավար աշխատանքը և՛ բարձրացնում, և՛ նվազեցնում է համախմբվածությունը՝ առանց պայմանները հստակեցնելու։</li>
+        <li><strong>Բացառված երրորդի օրենքը</strong> պահանջում է հստակ որոշել՝ վարկածը հաստատվեց, թե ոչ։</li>
+        <li><strong>Բավարար հիմքի օրենքը</strong> պահանջում է եզրակացությունը հիմնել տվյալների, այլ ոչ թե հետազոտողի նախնական ենթադրության վրա։</li>
+      </ul>
+    </div>
+
+    <div class="example-grid">
+      <div class="example-card"><div class="icon">🔄</div><p>Մի քանի ընկերություններում հեռավար աշխատանքի ներդրումից հետո արտադրողականության աճը դիտարկելուց հետո հետազոտողը ինդուկտիվորեն ձևակերպում է վարկած՝ «ճկուն գրաֆիկը դրականորեն է ազդում արտադրողականության վրա»։ Այնուհետև դեդուկտիվորեն կանխատեսում է, որ դա պետք է երևա ամբողջ ընտրանքում և ստուգում է տվյալներով։</p></div>
+      <div class="example-card"><div class="icon">🏛️</div><p>Ընդհանուր տեսությունից՝ «ապակենտրոնացումը մեծացնում է տեղական պատասխանատվությունը», բխեցվում է ստուգելի ենթադրություն՝ մարզային բյուջեների ինքնուրույնության աճից հետո տեղական ծրագրերի իրականացման տոկոսը պետք է բարձրանա։</p></div>
+      <div class="example-card"><div class="icon">🏷️</div><p>Ապրանքանիշի հավատարմության հետազոտության մեջ հստակ ձևակերպվում է՝ գնային զեղչերն ազդո՞ւմ են հավատարմության վրա, թե՞ ոչ, և տվյալների հիման վրա որոշվում է՝ որ վարկածն է հիմնավորվում։</p></div>
+    </div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում և հետևանք</strong>
+      <p>
+        Հետազոտողն աշխատանքի ընթացքում փոխում է հիմնական հասկացության իմաստը․
+        օրինակ՝ սկզբում «արդյունավետությունը» սահմանում է որպես ֆինանսական
+        ցուցանիշ, իսկ հետո այն օգտագործում է աշխատակիցների գոհունակության
+        իմաստով՝ առանց բացատրության։ Խախտվում է նույնության օրենքը, ընթերցողը
+        կորցնում է հետևելու հնարավորությունը, իսկ եզրակացությունները դառնում
+        են հակասական և անհամոզիչ։
+      </p>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic2-q9">
+    <div class="section-heading">
+      <div class="section-index">09</div>
+      <h2>Հետազոտության ընդհանուր գիտական և հատուկ (մասնավոր) մեթոդները</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>
+        Ընդհանուր գիտական մեթոդները կիրառելի են կառավարման համակարգերի
+        հետազոտության գրեթե ցանկացած փուլում։ Հատուկ մեթոդները դրանց
+        տրամաբանությունը հարմարեցնում են կառավարման կամ այլ կոնկրետ ոլորտի
+        խնդիրներին։
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Ընդհանուր գիտական մեթոդները</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Մեթոդ</th><th>Բացատրություն և կառավարման մեջ կիրառություն</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Վերլուծություն և սինթեզ</strong></td>
+              <td>Վերլուծությունը օբյեկտի մտավոր տրոհումն է առանձին մասերի, իսկ սինթեզը՝ դրանց միավորումը մեկ ամբողջության մեջ։ Օրինակ՝ նախ առանձին ուսումնասիրվում են ընկերության իրացվելիությունը, եկամտաբերությունն ու պարտքային բեռը, ապա դրանք միավորվում են ընդհանուր ֆինանսական վիճակի գնահատման մեջ։ Զուտ վերլուծությունը կորցնում է ընդհանուր պատկերը, իսկ առանց նախնական վերլուծության սինթեզը մնում է մակերեսային։</td>
+            </tr>
+            <tr>
+              <td><strong>Ինդուկցիա և դեդուկցիա</strong></td>
+              <td>Ինդուկցիան մասնավոր փաստերից անցումն է դեպի ընդհանուր օրինաչափություն, իսկ դեդուկցիան՝ ընդհանուր օրենքից դեպի կոնկրետ եզրակացություն։</td>
+            </tr>
+            <tr>
+              <td><strong>Աբստրահում</strong></td>
+              <td>Ոչ էական հատկանիշների մտովի անտեսում և կարևոր կողմերի առանձնացում։ Կազմակերպական կառուցվածքը պատկերելիս հետազոտողը կարող է անտեսել աշխատակիցների անհատական հատկանիշները և կենտրոնանալ պաշտոնների ու ենթակայության կապերի վրա։</td>
+            </tr>
+            <tr>
+              <td><strong>Համեմատություն</strong></td>
+              <td>Երկու կամ ավելի օբյեկտների նմանությունների և տարբերությունների բացահայտում։ Կառավարման ցուցանիշները համեմատվում են նախորդ ժամանակաշրջանի, մրցակիցների կամ ոլորտային միջինի հետ։</td>
+            </tr>
+            <tr>
+              <td><strong>Մոդելավորում</strong></td>
+              <td>Օբյեկտը փոխարինվում է դրա պարզեցված նմանակով՝ մոդելով։ Այն թույլ է տալիս կանխատեսել ֆինանսական ցուցանիշների փոփոխությունը տարբեր սցենարներում կամ մոդելավորել հաճախորդների հոսքը՝ առանց իրական փորձի։</td>
+            </tr>
+            <tr>
+              <td><strong>Ընդհանրացում</strong></td>
+              <td>Մասնավոր դեպքերից անցում դեպի ընդհանուր եզրակացություն։ Մի քանի կազմակերպչական փոփոխությունների ուսումնասիրությունից կարող են առանձնացվել հաջող փոփոխությանը նպաստող ընդհանուր գործոնները՝ հստակ հաղորդակցում, աշխատակիցների ներգրավում և փուլային իրականացում։</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Ընդհանուր գիտական մեթոդների հատուկ դրսևորումները կառավարման մեջ</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ընդհանուր գիտական մեթոդ</th><th>Հատուկ դրսևորումը կառավարման մեջ</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Համեմատություն</strong></td><td>Բենչմարքինգ՝ մրցակիցների կամ լավագույն փորձի հետ համեմատում։</td></tr>
+            <tr><td><strong>Վերլուծություն</strong></td><td>SWOT-վերլուծություն, ֆինանսական հարաբերակցությունների վերլուծություն։</td></tr>
+            <tr><td><strong>Մոդելավորում</strong></td><td>Բիզնես-գործընթացների և ֆինանսական մոդելավորում։</td></tr>
+            <tr><td><strong>Ընդհանրացում</strong></td><td>Սոցիոլոգիական հարցումների արդյունքների ընդհանրացում։</td></tr>
+            <tr><td><strong>Աբստրահում</strong></td><td>Կազմակերպական կառուցվածքի սխեմատիկ պատկերում՝ առանց ավելորդ մանրամասների։</td></tr>
+            <tr><td><strong>Ինդուկցիա</strong></td><td>Մի քանի ընկերությունների դեպքերի ուսումնասիրություն (case study)։</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px">
+        Գործնականում գրեթե յուրաքանչյուր հատուկ մեթոդի հիմքում մեկ կամ մի
+        քանի ընդհանուր գիտական մեթոդ է։ Այդ կապը հասկանալը օգնում է մեթոդը
+        ոչ թե մեխանիկորեն կիրառել, այլ հասկանալ՝ ինչու է այն աշխատում և
+        համապատասխանո՞ւմ է արդյոք կոնկրետ հետազոտական իրավիճակին։
+      </p>
+      <p>
+        Փորձագիտական գնահատման մեթոդները՝ Դելփյան տեխնիկան, նոմինալ խմբային
+        մեթոդը, ուղեղային գրոհը և այլն, իրենց ծավալի ու կարևորության պատճառով
+        դիտարկվում են որպես առանձին թեմա։
+      </p>
+    </div>
+
+    <div class="example-grid">
+      <div class="example-card"><div class="icon">🏬</div><p>Մանրածախ ցանցի արդյունավետության հետազոտության ժամանակ համեմատության մեթոդը հատուկ ձև է ստանում՝ բենչմարքինգ։ Ընկերության ցուցանիշները համեմատվում են ոլորտի առաջատարների հետ՝ վաճառք մեկ քառակուսի մետրի հաշվով կամ պաշարների շրջանառելիություն։</p></div>
+      <div class="example-card"><div class="icon">💬</div><p>Ապրանքանիշի ընկալման հետազոտության մեջ վերլուծության հատուկ ձևը բովանդակային վերլուծությունն է (content analysis), երբ սոցիալական ցանցերի հրապարակումները կոդավորվում ու վերլուծվում են նախապես սահմանված կատեգորիաներով։</p></div>
+      <div class="example-card"><div class="icon">🏭</div><p>Մի քանի ստորաբաժանումների արդյունավետությունն ուսումնասիրելիս ինդուկցիան կարող է կիրառվել որպես համեմատական դեպքերի ուսումնասիրություն՝ հաջողված և անհաջող դեպքերից ընդհանուր օրինաչափություններ ստանալու համար։</p></div>
+    </div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում և հետևանք</strong>
+      <p>
+        Հետազոտողը կիրառում է SWOT-վերլուծություն՝ առանց դրա հիմքում ընկած
+        համեմատական վերլուծության տրամաբանությունը հասկանալու։ Աղյուսակը
+        լրացվում է չհիմնավորված պնդումներով, օրինակ՝ «թույլ կողմ է ցածր
+        մոտիվացիան»՝ առանց տվյալների կամ համեմատության։ Այդ դեպքում
+        SWOT-ը դառնում է ձևական վարժություն և չի օգնում կոնկրետ
+        կառավարչական որոշումների կայացմանը։
+      </p>
+    </div>
+  </section>
+
+  <div class="footer-note">
+    Թեմա 2 · Կառավարման համակարգերի հետազոտության մեթոդաբանությունը
+  </div>
+</div>  
+
+      <div id="topic3" class="topic-content" hidden>
+  <header class="hero">
+    <span class="hero-label">Թեմա 3 · Տեղեկատվության ուսումնասիրություն և թեստավորում</span>
+    <h1>Տեղեկատվության հավաքագրումը և թեստավորումը կառավարման համակարգերի հետազոտություններում</h1>
+    <p>Թեման ներկայացնում է տեղեկատվության հավաքագրման մեթոդները, որակի չափանիշները, առաջնային ու երկրորդական աղբյուրները, հարցումների կազմակերպումը և թեստավորման կիրառությունը։</p>
+  </header>
+
+  <section class="content-section" id="topic3-q10">
+    <div class="section-heading">
+      <div class="section-index">10</div>
+      <h2>Տեղեկատվության հավաքագրման մեթոդները, տիպերը, արդյունավետության ցուցանիշները</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>Կառավարման համակարգերի ցանկացած հետազոտություն, անկախ կիրառվող մեթոդից, հանգում է տեղեկատվության հավաքագրմանը, մշակմանը և մեկնաբանությանը։ Առանց հավաստի և բավարար տեղեկատվության՝ վերլուծությունը, մոդելավորումը կամ եզրակացությունը կորցնում է իր արժեքը։ Հետևաբար հետազոտողը պետք է հասկանա՝ ինչպես հավաքագրել տեղեկատվությունը, ինչ տեսակներ կան և ինչպես գնահատել դրա որակը։</p>
+    </div>
+
+    <div class="card">
+      <h3>Տեղեկատվության հավաքագրման հիմնական մեթոդները</h3>
+      <ul class="bullet-list">
+        <li><strong>Փաստաթղթերի ուսումնասիրություն</strong> — կանոնադրությունների, հրամանների, հաշվետվությունների և այլ կազմակերպչական փաստաթղթերի վերլուծություն։</li>
+        <li><strong>Դիտարկում</strong> — կառավարման գործընթացների անմիջական հետևում և արձանագրում։</li>
+        <li><strong>Հարցում և հարցազրույց</strong> — աշխատակիցներից, ղեկավարներից կամ հաճախորդներից տեղեկատվության ուղղակի հավաքագրում։</li>
+        <li><strong>Թեստավորում</strong> — կառավարման համակարգի սուբյեկտների, կապերի կամ գործառույթների ստանդարտացված ստուգում։</li>
+        <li><strong>Վիճակագրական տվյալների վերլուծություն</strong> — կազմակերպության առկա հաշվետվությունների և տվյալների բազաների ուսումնասիրություն։</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Տեղեկատվության հավաքագրման արդյունավետության ցուցանիշները</h3>
+      <ul class="bullet-list">
+        <li><strong>Երթուղիների ռացիոնալություն</strong> — որքան կարճ և ուղիղ է տեղեկատվության ճանապարհը աղբյուրից մինչև օգտագործողը՝ առանց ավելորդ միջանկյալ օղակների։</li>
+        <li><strong>Կանոնակարգվածություն</strong> — տեղեկատվական հոսքի որ մասն է կառավարվում հստակ ընթացակարգերով, և որը՝ առանց սահմանված կանոնի։</li>
+        <li><strong>Ռեժիմների ռացիոնալություն</strong> — տեղեկատվության հավաքագրման հաճախականության և ծավալի համապատասխանությունը կառավարչական կարիքներին։</li>
+      </ul>
+
+      <div class="example-grid">
+        <div class="example-card"><div class="icon">📄</div><p>Պայմանագրի հաստատման ընթացքում յոթ բաժնի մասնակցությունից երեքը կրկնվում են։ Ցածր երթուղային ռացիոնալության ցուցանիշը հիմք է դառնում գործընթացը պարզեցնելու համար։</p></div>
+        <div class="example-card"><div class="icon">🏥</div><p>Հիվանդանոցում տվյալների հավաքագրման գործընթացների միայն 40%-ն է կանոնակարգված։ Մնացածը կատարվում է աշխատակիցների անհատական մոտեցմամբ՝ առաջացնելով անհամապատասխանություններ։</p></div>
+        <div class="example-card"><div class="icon">📊</div><p>Պետական մարմինը շաբաթական հաշվետվություններ է պահանջում, թեև տվյալները փոխվում են ամսական։ Սա վկայում է հավաքագրման ռեժիմի ցածր ռացիոնալության մասին։</p></div>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Հետազոտողը արդյունավետությունը գնահատում է միայն աշխատակիցների սուբյեկտիվ կարծիքով՝ առանց որևէ ցուցանիշ հաշվարկելու։ Եզրակացությունները մնում են չստուգելի, իսկ «մինչև» և «հետո» վիճակների համեմատությունը՝ անհնար։</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic3-q11">
+    <div class="section-heading">
+      <div class="section-index">11</div>
+      <h2>Տեղեկատվության հագեցվածությունը, հավաստիությունը և արժեքայնությունը</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>Հավաքագրված տեղեկատվության ծավալն ինքնանպատակ չէ․ կարևոր է դրա որակը։ Տեղեկատվությունը գնահատվում է հագեցվածության, հավաստիության և արժեքայնության տեսանկյունից։</p>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Հատկանիշ</th><th>Ի՞նչ է ցույց տալիս</th><th>Օրինակ</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Հագեցվածություն</strong></td><td>Որքանով է տեղեկատվությունը ընդգրկում ուսումնասիրվող երևույթի կարևոր կողմերը։</td><td>Ֆինանսական վիճակը գնահատելիս մի քանի տարվա տվյալներն ու ոլորտային համեմատությունը ավելի լիարժեք պատկեր են տալիս, քան մեկ եռամսյակի տվյալը։</td></tr>
+            <tr><td><strong>Հավաստիություն</strong></td><td>Տեղեկատվության՝ իրականությանը համապատասխանելու աստիճանը։ Ստուգման համար կարելի է համադրել մի քանի անկախ աղբյուր։</td><td>Ընկերության հաշվետվությունները համեմատվում են անկախ աուդիտի եզրակացության հետ։</td></tr>
+            <tr><td><strong>Արժեքայնություն</strong></td><td>Տեղեկատվության օգտակարությունը հենց տվյալ հետազոտական խնդրի լուծման համար։</td><td>Աշխատակիցների տարիքային կազմը կարևոր կարող է լինել կադրային քաղաքականության, բայց ոչ արտադրական գործընթացների հետազոտության համար։</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="example-grid">
+        <div class="example-card"><div class="icon">🔎</div><p>Ապրանքանիշի ընկալման ամբողջական պատկեր ստանալու համար համադրվում են հարցումների, սոցիալական մեդիայի, բողոքների և վաճառքի տվյալները։</p></div>
+        <div class="example-card"><div class="icon">✅</div><p>Տեղեկատվության հավաստիությունը ստուգելու համար ընկերության հաշվետվությունները համեմատվում են անկախ աուդիտի տվյալների հետ։</p></div>
+        <div class="example-card"><div class="icon">🎯</div><p>Կադրային քաղաքականության ուսումնասիրության ժամանակ հավաքագրվում են միայն նպատակին առնչվող տվյալներ՝ օրինակ՝ ստաժ, կրթություն և արտադրողականություն։</p></div>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Հետազոտողը մեծ ծավալի տվյալներ է հավաքագրում՝ առանց դրանց հավաստիությունը ստուգելու։ Եթե տվյալները սխալ կամ հնացած են, դրանց վրա հիմնված եզրակացությունները կարող են կասկածի տակ դնել ամբողջ հետազոտությունը։</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic3-q12">
+    <div class="section-heading">
+      <div class="section-index">12</div>
+      <h2>Առաջնային և երկրորդական տեղեկատվություն</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p><strong>Առաջնային տեղեկատվությունը</strong> հետազոտողի կողմից տվյալ ուսումնասիրության նպատակով անմիջապես հավաքագրված տվյալներն են։ <strong>Երկրորդական տեղեկատվությունը</strong> տվյալներն են, որոնք արդեն հավաքվել կամ հրապարակվել են այլ անձանց կողմից՝ այլ նպատակներով։</p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Առաջնային տեղեկատվություն</h3>
+        <p>Ստացվում է սեփական հարցումների, հարցազրույցների, դիտարկումների և թեստերի միջոցով։ Այն համապատասխանում է հետազոտության կոնկրետ նպատակին, բայց հավաքագրումը կարող է պահանջել ավելի շատ ժամանակ և ռեսուրսներ։</p>
+        <p>Անհրաժեշտ է, երբ հրապարակված տվյալները բացակայում են կամ բավարար չեն, կամ երբ ուսումնասիրվում է կոնկրետ կազմակերպության առանձնահատուկ ներքին խնդիր։ Հետազոտողը պետք է հաշվի առնի ընտրանքի ձևավորումը, մեթոդական պատրաստվածությունը, տեղեկացված համաձայնությունը և գաղտնիությունը։</p>
+      </div>
+
+      <div class="card">
+        <h3>Երկրորդական տեղեկատվություն</h3>
+        <p>Աղբյուրներ կարող են լինել պետական վիճակագրությունը, ոլորտային հետազոտությունները, գիտական աշխատանքները, մրցակիցների հաշվետվությունները և կազմակերպության արխիվային փաստաթղթերը։</p>
+        <p>Այն սովորաբար հասանելի է ավելի արագ ու ցածր ծախսով, բայց կարող է չհամապատասխանել հետազոտության նպատակին։ Պետք է ստուգել տվյալների արդիականությունը, հավաքագրման մեթոդաբանությունը և աղբյուրի հնարավոր կողմնակալությունը։</p>
+        <ul class="bullet-list">
+          <li><strong>Ներքին աղբյուրներ</strong> — կազմակերպության արխիվային փաստաթղթեր և նախորդ ներքին հետազոտություններ։</li>
+          <li><strong>Արտաքին աղբյուրներ</strong> — պետական վիճակագրություն, գիտական հոդվածներ և ոլորտային զեկույցներ։</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout good">
+      <strong>Գործնական մոտեցում</strong>
+      <p>Հետազոտությունը հաճախ սկսվում է երկրորդական տեղեկատվության ուսումնասիրությամբ՝ թեմային կողմնորոշվելու և բացահայտված գիտելիքի բացերը գտնելու համար։ Այնուհետև առաջնային տվյալները լրացնում են այդ բացերը։</p>
+    </div>
+
+    <div class="example-grid">
+      <div class="example-card"><div class="icon">🛒</div><p>Շուկայի հետազոտողը նախ դիտարկում է պետական վիճակագրությունը, ապա սեփական հարցմամբ պատասխանում կոնկրետ հետազոտական հարցին։</p></div>
+      <div class="example-card"><div class="icon">🏢</div><p>Կազմակերպության արխիվային փաստաթղթերը երկրորդական տեղեկատվություն են, իսկ ընթացիկ աշխատակիցների հետազոտողի անցկացրած հարցազրույցները՝ առաջնային։</p></div>
+      <div class="example-card"><div class="icon">📚</div><p>Երկրորդային աղբյուրների ուսումնասիրությունը օգնում է պարզել՝ ինչն արդեն հայտնի է և որ հարցերն են դեռ լրացուցիչ տվյալներ պահանջում։</p></div>
+    </div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում և հետևանք</strong>
+      <p>Հետազոտողը հիմնվում է միայն այլ երկրների հրապարակված հետազոտությունների վրա և տվյալներ չի հավաքագրում ուսումնասիրվող կազմակերպությունից։ Եզրակացություններն անտեսում են կազմակերպության առանձնահատկությունները, և առաջարկությունները կարող են չհամապատասխանել իրավիճակին։</p>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic3-q13">
+    <div class="section-heading">
+      <div class="section-index">13</div>
+      <h2>Հարցումների մեթոդը հետազոտության մեջ</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>Հարցումը նախապես մշակված հարցերի միջոցով հետազոտվող անձանցից առաջնային տեղեկատվություն ստանալու մեթոդ է։ Այն կարող է անցկացվել դեմ առ դեմ, հեռախոսով, առցանց կամ ինքնալրացվող հարցաթերթով։</p>
+    </div>
+
+    <div class="card">
+      <h3>Հարցման կազմակերպման փուլերը</h3>
+      <ol class="number-list">
+        <li>Սահմանել հետազոտական խնդիրը և անհրաժեշտ տեղեկատվությունը։</li>
+        <li>Սահմանել գլխավոր համակցությունը՝ հետազոտության հնարավոր մասնակիցների ամբողջությունը։</li>
+        <li>Ձևավորել ընտրանքը՝ գլխավոր համակցությունից ընտրված մասնակիցների խումբը։</li>
+        <li>Մշակել հարցաթերթիկը։</li>
+        <li>Անցկացնել փորձնական հարցում՝ հարցերի հասկանալիությունն ու տրամաբանությունը ստուգելու համար։</li>
+        <li>Հավաքագրել հիմնական տվյալները։</li>
+        <li>Մշակել և վերլուծել տվյալները։</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>Ընտրանքի հիմնական մեթոդները</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Մեթոդ</th><th>Նկարագրություն</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Պարզ պատահական</strong></td><td>Յուրաքանչյուր անձ ունի ընտրվելու հավասար հնարավորություն։</td></tr>
+            <tr><td><strong>Շերտավորված</strong></td><td>Գլխավոր համակցությունը բաժանվում է խմբերի՝ օրինակ ըստ տարիքի, սեռի կամ բնակության վայրի։</td></tr>
+            <tr><td><strong>Կլաստերային</strong></td><td>Ընտրվում են ամբողջական խմբեր՝ օրինակ կազմակերպություններ կամ համայնքներ։</td></tr>
+            <tr><td><strong>Նպատակային</strong></td><td>Ընտրվում են կոնկրետ հատկանիշներ ունեցող մասնակիցներ՝ օրինակ ոլորտի փորձագետներ։</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Ընտրանքի ծավալի վրա ազդող գործոնները</h3>
+      <ul class="bullet-list">
+        <li><strong>Վստահության մակարդակ</strong> — որքան վստահությամբ ենք ուզում պնդել, որ ընտրանքի արդյունքը մոտ է գլխավոր համակցության իրական ցուցանիշին։</li>
+        <li><strong>Թույլատրելի սխալ</strong> — ընտրանքից ստացված արդյունքի հնարավոր տարբերությունը գլխավոր համակցության իրական ցուցանիշից։</li>
+        <li><strong>Հատկանիշի ենթադրվող տարածվածություն (p)</strong> — գլխավոր համակցության այն մասնաբաժինը, որը ենթադրաբար ունի ուսումնասիրվող հատկանիշը։ Նախնական տվյալների բացակայության դեպքում հաճախ ընդունվում է p = 0.5։</li>
+      </ul>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Վստահության մակարդակ</th><th>Z գործակից</th><th>Սխալի սահման</th><th>Ընդհանուր կիրառություն</th></tr></thead>
+          <tbody>
+            <tr><td>90%</td><td>1.645</td><td>±10% կամ ավելի խիստ</td><td>Նախնական կամ արագ հետազոտություն</td></tr>
+            <tr><td>95%</td><td>1.96</td><td>Հաճախ՝ ±5%</td><td>Գործնական հետազոտությունների տարածված չափանիշ</td></tr>
+            <tr><td>99%</td><td>2.576</td><td>Կախված հետազոտության դիզայնից</td><td>Բարձր վստահելիության պահանջ</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <strong>Ընտրանքի մոտավոր հաշվարկ</strong>
+        <p>Մեծ կամ անսահման գլխավոր համակցության պարզ պատահական ընտրանքի համար կիրառվում է՝</p>
+        <p style="margin-top:8px"><strong>n₀ = Z² × p × (1 − p) / e²</strong></p>
+        <p>որտեղ n₀-ն նախնական ընտրանքի ծավալն է, Z-ը՝ վստահության մակարդակի գործակիցը, p-ն՝ ենթադրվող տարածվածությունը, իսկ e-ն՝ թույլատրելի սխալի սահմանը։</p>
+        <p style="margin-top:8px">95% վստահության մակարդակի դեպքում (Z = 1.96), p = 0.5 և e = 0.05 դեպքում ստացվում է մոտ <strong>384 մասնակից</strong>։ Փոքր և հայտնի գլխավոր համակցության դեպքում կիրառվում է վերջավոր համակցության ճշգրտումը՝ <strong>n = n₀ / [1 + (n₀ − 1) / N]</strong>, որտեղ N-ը գլխավոր համակցության չափն է։</p>
+      </div>
+
+      <div class="callout bad">
+        <strong>Ուշադրություն՝ ընտրանքի հաշվարկի օրինակի ուղղում</strong>
+        <p>Եթե N = 50,000, n₀ = 384, ապա վերջավոր համակցության ճշգրտումից հետո ընտրանքը մոտ 381 է, ոչ թե 3,812։ Այս հաշվարկը ենթադրում է պարզ պատահական ընտրանք, ±5% սխալ և 95% վստահության մակարդակ։ Ընտրանքի ներկայացուցչականությունը կախված է նաև ճիշտ ընտրության մեթոդից, ոչ միայն մասնակիցների թվից։</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Ընտրանքի օրինակ․ ծառայությունից բավարարվածություն</h3>
+      <p>Ենթադրենք ծառայությունից օգտվում է 50,000 մարդ։ 95% վստահության մակարդակի, ±5% թույլատրելի սխալի և p = 0.5 ենթադրության դեպքում պահանջվում է մոտ 381 հարցվող։ Եթե օգտվողները տարբեր խմբերի են բաժանվում, կարելի է կիրառել շերտավորված ընտրանք՝ ընտրանքում այդ խմբերի համամասնությունները պահպանելով։</p>
+      <p>Եթե 381 հարցվողից 267-ը նշեն, որ գոհ են, ապա բավարարվածությունը կլինի մոտ <strong>70.1%</strong>՝ 267 ÷ 381 × 100։</p>
+    </div>
+
+    <div class="card">
+      <h3>Հարցաթերթիկի կազմման սկզբունքները</h3>
+      <p>Հարցերը պետք է լինեն հստակ, կարճ, միանշանակ և չեզոք։ Պետք է խուսափել ուղղորդող ձևակերպումներից։</p>
+      <div class="two-col">
+        <div class="callout bad">
+          <strong>Ուղղորդող հարց</strong>
+          <p>«Համաձա՞յն եք, որ համալսարանի նոր արդյունավետ համակարգը պետք է պահպանվի»։</p>
+        </div>
+        <div class="callout good">
+          <strong>Չեզոք հարց</strong>
+          <p>«Ինչպե՞ս եք գնահատում համալսարանում ներդրված նոր համակարգը»։</p>
+        </div>
+      </div>
+      <p style="margin-top:14px"><strong>Փակ հարցի օրինակ․</strong> «Որքա՞ն հաճախ եք օգտվում հասարակական տրանսպորտից»։</p>
+      <ul class="bullet-list">
+        <li>Ամեն օր</li>
+        <li>Շաբաթական մի քանի անգամ</li>
+        <li>Հազվադեպ</li>
+        <li>Երբեք</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Հարցման արդյունքների ամփոփում</h3>
+      <ol class="number-list">
+        <li><strong>Հաճախականություններ և տոկոսներ</strong> — հաշվվում է յուրաքանչյուր պատասխանի քանակն ու տոկոսային բաժինը։</li>
+        <li><strong>Միջին մեծություններ</strong> — ամփոփվում են թվային տվյալները, օրինակ՝ միջին թվաբանականը։</li>
+        <li><strong>Խմբավորում և աղյուսակավորում</strong> — արդյունքները համեմատվում են ըստ տարիքի, սեռի, կրթության կամ այլ հատկանիշների։</li>
+        <li><strong>Համեմատական վերլուծություն</strong> — համեմատվում են խմբերը, ժամանակահատվածները կամ ցուցանիշները։ Օրինակ՝ բավարարվածության աճը 68%-ից մինչև 78% կազմում է 10 տոկոսային կետ։</li>
+      </ol>
+      <div class="callout good">
+        <p>Հարցման հավաստիությունը կախված է ոչ միայն ընտրանքի չափից, այլև ընտրանքի որակից, հարցերի ձևակերպումից, տվյալների հավաքագրման եղանակից և ներկայացուցչականությունից։</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic3-q14">
+    <div class="section-heading">
+      <div class="section-index">14</div>
+      <h2>Թեստավորման կիրառությունը կառավարման համակարգերի ուսումնասիրության մեջ</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>Թեստավորումը ստանդարտացված ընթացակարգ է, որի միջոցով կարելի է քանակապես չափել կառավարման համակարգի որոշակի բնութագրերը։ Միասնական գործիքակազմը հնարավորություն է տալիս համեմատել տարբեր մարդկանց, ստորաբաժանումների կամ ժամանակահատվածների արդյունքները։</p>
+    </div>
+
+    <div class="card">
+      <h3>Թեստավորման կիրառման ուղղությունները</h3>
+      <ul class="bullet-list">
+        <li><strong>Անձնակազմի թեստավորում</strong> — մասնագիտական գիտելիքների, կարողությունների, անհատականության գծերի կամ մոտիվացիայի գնահատում։</li>
+        <li><strong>Կապերի թեստավորում</strong> — կազմակերպության հաղորդակցական և միջանձնային կապերի որակի ու ինտենսիվության ուսումնասիրություն։</li>
+        <li><strong>Գործառույթների թեստավորում</strong> — աշխատակիցների պարտականությունների ըմբռնման և կատարման, ինչպես նաև գործառույթների բաշխման ստուգում։</li>
+      </ul>
+
+      <div class="example-grid">
+        <div class="example-card"><div class="icon">👥</div><p>Կադրային ռեզերվի ընտրության ժամանակ գնահատվում են ղեկավարների որոշումների կայացման, պատվիրակման և կոնֆլիկտների կառավարման կարողությունները։</p></div>
+        <div class="example-card"><div class="icon">🔗</div><p>Սոցիոմետրիկ հարցաթերթը ցույց է տալիս, որ փոխկապակցված նախագծերով աշխատող երկու բաժինների միջև ուղղակի հաղորդակցությունը գրեթե բացակայում է։</p></div>
+        <div class="example-card"><div class="icon">📋</div><p>Նոր կառուցվածքի ներդրումից հետո պարզվում է, որ աշխատակիցների 30%-ը սխալ է հասկանում իր նոր պարտականությունները։</p></div>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Աշխատակիցների կարողությունները գնահատվում են ընդհանուր թեստով, որը կապ չունի պաշտոնի պահանջների հետ։ Արդյունքները չեն արտացոլում մասնագիտական պատրաստվածությունը և կարող են հանգեցնել սխալ կամ անարդար կադրային որոշումների։</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Թեստերի հիմնական տեսակները</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Տեսակ</th><th>Ի՞նչ է գնահատում</th><th>Օրինակ</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Գիտելիքի</strong></td><td>Մասնագիտական տեղեկացվածությունը։</td><td>Ընկերության ներքին ընթացակարգերի իմացություն։</td></tr>
+            <tr><td><strong>Կարողությունների</strong></td><td>Գործնական հմտություններ և ունակություններ։</td><td>Վերլուծական մտածողություն կամ թվային գրագիտություն։</td></tr>
+            <tr><td><strong>Անհատականության</strong></td><td>Աշխատանքային վարքագծի հետ առնչվող անձնային հատկանիշներ։</td><td>Թիմային աշխատանք կամ սթրեսակայունություն։</td></tr>
+            <tr><td><strong>Վերաբերմունքի կամ արժեքների</strong></td><td>Վերաբերմունքը կազմակերպության, աշխատանքի կամ փոփոխությունների նկատմամբ։</td><td>Կազմակերպչական փոփոխությունների ընդունում։</td></tr>
+            <tr><td><strong>Իրավիճակային</strong></td><td>Աշխատանքային իրավիճակներում առաջարկվող լուծումները։</td><td>Կոնֆլիկտային իրավիճակում կառավարչական որոշում։</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Ըստ անցկացման ձևի՝ թեստերը կարող են լինել գրավոր կամ գործնական, իսկ ըստ ժամանակի՝ սահմանափակված կամ առանց ժամանակային սահմանափակման։</p>
+
+      <div class="callout good">
+        <strong>Օրինակներ</strong>
+        <p>Ֆինանսական բաժնի աշխատակիցների ընտրության ժամանակ մասնագիտական գիտելիքի թեստը կարելի է զուգակցել թվային տվյալների վերլուծության կարողությունների թեստի հետ։</p>
+        <p style="margin-top:8px">Կառավարչական պաշտոնի թեկնածուին կարելի է ներկայացնել թիմային կոնֆլիկտի իրավիճակ և գնահատել լուծումը նախապես սահմանված չափանիշներով։</p>
+      </div>
+
+      <div class="callout bad">
+        <strong>Էթիկական զգուշացում</strong>
+        <p>Անհատականության թեստերը չպետք է օգտագործվեն աշխատակիցներին պարզունակորեն «լավ» կամ «վատ» դասակարգելու համար։ Դրանց արդյունքները պետք է մեկնաբանվեն զգուշությամբ և համապատասխան մասնագիտական ու էթիկական չափանիշներով։</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Թեստի կառուցվածքը և կազմման սկզբունքները</h3>
+      <p>Թեստը ներառում է հրահանգներ, առաջադրանքներ կամ հարցեր, պատասխանների տարբերակներ կամ գնահատման սանդղակ և արդյունքների մեկնաբանման բանալի։</p>
+      <ol class="number-list">
+        <li><strong>Վավերականություն</strong> — թեստը պետք է չափի հենց այն հատկանիշը, որի համար նախատեսված է։</li>
+        <li><strong>Հուսալիություն</strong> — կրկնակի կիրառման դեպքում արդյունքները պետք է լինեն բավականաչափ հետևողական ու կայուն։</li>
+        <li><strong>Օբյեկտիվություն</strong> — գնահատման արդյունքը չպետք է կախված լինի գնահատողի սուբյեկտիվ կարծիքից։</li>
+        <li><strong>Ստանդարտացվածություն</strong> — հրահանգները, ժամանակը և անցկացման պայմանները պետք է լինեն միասնական։</li>
+        <li><strong>Նպատակին համապատասխանություն</strong> — թեստը պետք է կազմվի կոնկրետ հետազոտական կամ գործնական խնդրի համար։</li>
+      </ol>
+
+      <div class="callout good">
+        <strong>Գործնական խորհուրդ</strong>
+        <p>Մինչև լայն կիրառումը թեստը փորձարկիր փոքր խմբի վրա՝ հարցերի հասկանալիությունը և գործիքի աշխատանքը ստուգելու համար։ Գնահատման հստակ բանալին օգնում է տարբեր գնահատողներին նույն պատասխանների համար տալ համադրելի միավորներ։</p>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>«Վերլուծական մտածողության» թեստը իրականում ստուգում է միայն փաստերի մտապահումը։ Արդյունքները սխալմամբ մեկնաբանվում են որպես վերլուծական կարողության չափում, ինչը կարող է հանգեցնել սխալ կադրային որոշումների։</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Թեստի արդյունքների մշակում և գնահատում</h3>
+      <ol class="number-list">
+        <li><strong>Առաջնային մշակում</strong> — պատասխանների հավաքագրում, թերի կամ սխալ լրացված թեստերի առանձնացում և տվյալների մուտքագրում։</li>
+        <li><strong>Միավորների հաշվարկ</strong> — պատասխանների գնահատում նախապես մշակված բանալիով։</li>
+        <li><strong>Նորմավորում</strong> — անհատական միավորի համեմատում համապատասխան խմբի կամ նորմի հետ։</li>
+        <li><strong>Վիճակագրական վերլուծություն</strong> — խմբային միտումների, տարբերությունների և կապերի բացահայտում։</li>
+        <li><strong>Մեկնաբանություն և հաշվետվություն</strong> — արդյունքների ներկայացում հասկանալի եզրակացությունների և գործնական առաջարկությունների տեսքով։</li>
+      </ol>
+
+      <div class="callout good">
+        <strong>Օրինակ</strong>
+        <p>Կառավարչական կարողությունների թեստի արդյունքները վերլուծվում են ոչ միայն ընդհանուր միավորով, այլև ըստ ենթակարողությունների՝ որոշումների կայացում, պատվիրակում և հետադարձ կապ։ Սա թույլ է տալիս մշակել անհատական զարգացման ծրագրեր։</p>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Հրապարակվում են միայն հում միավորները՝ առանց համեմատության, նորմավորման կամ մեկնաբանության։ Ղեկավարությունը չի կարող հասկանալ՝ միավորը ինչ է նշանակում և ինչ քայլեր են անհրաժեշտ, ու թեստավորման գործնական արժեքը նվազում է։</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">Թեմա 3 · Տեղեկատվության ուսումնասիրություն և թեստավորում</div>
+</div>
+    
+    <div id="topic4" class="topic-content" hidden>
+  <header class="hero">
+    <span class="hero-label">Թեմա 4 · Փորձագիտական գնահատումներ</span>
+    <h1>Փորձագիտական գնահատումների մեթոդները կառավարման համակարգերի հետազոտությունում</h1>
+    <p>Թեման ներկայացնում է փորձագիտական գնահատումների մեթոդաբանությունը, տեղեկատվական ապահովումը, օբյեկտիվության ու հուսալիության ապահովումը, չափման ընթացակարգերը և կոլեկտիվ փորձագիտական գնահատումների հիմնական մեթոդները։</p>
+  </header>
+
+  <section class="content-section" id="topic4-q15">
+    <div class="section-heading">
+      <div class="section-index">15</div>
+      <h2>Փորձագիտական գնահատումների մեթոդաբանությունը, տեղեկատվական ապահովումը, կազմակերպումը, խնդիրների ընտրությունը</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>Կառավարման համակարգերի հետազոտության մեջ հաճախ հանդիպում են խնդիրներ, որոնք դժվար է կամ անհնար է լուծել զուտ քանակական մեթոդներով՝ վիճակագրական վերլուծությամբ կամ մոդելավորմամբ։ Դրա պատճառ կարող են լինել բավարար վիճակագրական տվյալների բացակայությունը, բարձր անորոշությունը կամ խնդրի բազմաչափանիշային բնույթը։ Այս իրավիճակներում կիրառվում է փորձագիտական գնահատման մեթոդը։</p>
+      <p>Փորձագիտական գնահատման էությունն այն է, որ խնդրի լուծման կամ երևույթի գնահատման համար ներգրավվում են բարձր որակավորում և փորձառություն ունեցող մասնագետներ։ Նրանց կուտակած գիտելիքն ու ինտուիցիան օգտագործվում են որպես տեղեկատվության աղբյուր, երբ այլ եղանակով անհրաժեշտ տեղեկությունը հնարավոր չէ ստանալ։ Ի տարբերություն սովորական հարցման, որտեղ հարցվողների կարծիքները հավասարարժեք են, փորձագիտական գնահատման մեջ կարևոր են մասնակիցների գիտելիքը, փորձը և մասնագիտական իրավասությունը տվյալ ոլորտում։</p>
+    </div>
+
+    <div class="card">
+      <h3>Փորձագիտական գնահատման մեթոդաբանությունը</h3>
+      <p>Մեթոդաբանությունը ներառում է հետևյալ հիմնական բաղադրիչները․</p>
+      <ol class="number-list">
+        <li><strong>Կազմակերպչական կառուցվածք.</strong> ձևավորվում է կազմակերպիչների աշխատանքային խումբ, որը պատասխանատու է գործընթացի պլանավորման, փորձագետների ընտրության, հարցման անցկացման և արդյունքների մշակման համար։</li>
+        <li><strong>Մեթոդական գործիքակազմ.</strong> ընտրվում են կոնկրետ գնահատման ընթացակարգերը, որոնք մանրամասն ներկայացվում են թեմայի հետագա բաժիններում։</li>
+        <li><strong>Կազմակերպչական ընթացակարգ.</strong> սահմանվում է՝ փորձագետները շփվելու են անհատական, թե խմբային եղանակով, գնահատումն անանուն է լինելու, թե բաց, և քանի փուլով է այն անցկացվելու։</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>Փորձագիտական գնահատման կազմակերպումը</h3>
+      <p>Գործընթացը ներառում է խնդրի ձևակերպում, փորձագիտական խմբի ձևավորում, գնահատման ընթացակարգի ընտրություն, հարցման անցկացում, արդյունքների մշակում և եզրակացությունների ձևակերպում։ Ամբողջ ցիկլը մանրամասն ներկայացված է ստորև՝ «Փորձաքննության փուլերը» բաժնում։</p>
+
+      <div class="example-grid">
+        <div class="example-card">
+          <div class="icon">💻</div>
+          <p>Ընկերության թվայնացման ռազմավարության հետազոտության մեջ, երբ ապագա տեխնոլոգիաների ազդեցության վերաբերյալ բավարար քանակական տվյալներ չկան, ձևավորվում է ութ փորձագետից բաղկացած խումբ՝ ՏՏ ղեկավարներից և ոլորտային վերլուծաբաններից՝ հնարավոր տեխնոլոգիական ուղղությունների առաջնահերթությունը գնահատելու համար։</p>
+        </div>
+        <div class="example-card">
+          <div class="icon">🚀</div>
+          <p>Նոր արտադրանքի շուկայահանման ռիսկերը գնահատելիս, երբ պատմական տվյալներ չկան, քանի որ արտադրանքը արմատապես նոր է, ներգրավվում են ոլորտի փորձառու մասնագետներ։</p>
+        </div>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Հետազոտողը փորձագիտական գնահատում է կիրառում, թեև առկա են բավարար քանակությամբ հուսալի վիճակագրական տվյալներ, որոնք կարելի է վերլուծել քանակական մեթոդներով։ Արդյունքները կարող են լինել ավելի սուբյեկտիվ և պակաս ճշգրիտ, քան քանակական վերլուծության դեպքում, իսկ փորձագետների ներգրավման վրա ծախսվում են ավելորդ ռեսուրսներ։</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Փորձագիտական հետազոտությունների տեղեկատվական ապահովումը</h3>
+      <p>Փորձագիտական հետազոտության հաջողությունը մեծապես կախված է նրանից, թե որքան բավարար և որակյալ տեղեկատվություն ունեն փորձագետները գնահատում կատարելու համար։ Տեղեկատվական ապահովումը ներառում է մի քանի բաղադրիչ․</p>
+      <ol class="number-list">
+        <li><strong>Խնդրի բովանդակային նկարագրություն.</strong> փորձագետներին տրամադրվում է հստակ և ամբողջական նկարագրություն, ներառյալ խնդրի նախապատմությունը, սահմանները և կապակցված գործոնները։</li>
+        <li><strong>Հիմնավորող տվյալներ.</strong> տրամադրվում են առկա վիճակագրական, փաստաթղթային կամ այլ տվյալներ, որոնք կօգնեն ձևավորելու հիմնավորված կարծիք և թույլ չեն տա սահմանափակվել զուտ ինտուիցիայով։</li>
+        <li><strong>Գնահատման չափանիշներ.</strong> հստակ սահմանվում են այն ցուցանիշներն ու սանդղակները, որոնցով փորձագետները պետք է արտահայտեն իրենց կարծիքը։</li>
+        <li><strong>Հետադարձ կապի մեխանիզմ.</strong> հատկապես կոլեկտիվ, բազմափուլ գնահատումների դեպքում փորձագետներին տրամադրվում է մյուս մասնակիցների կարծիքների ամփոփ պատկերը՝ առանց հեղինակների բացահայտման, որպեսզի նրանք կարողանան վերանայել իրենց դիրքորոշումը։</li>
+      </ol>
+      <p>Տեղեկատվության ծավալը պետք է հավասարակշռված լինի․ անբավարար տեղեկատվությունը հանգեցնում է մակերեսային գնահատականների, իսկ չափազանց մեծ, անկառուցվածք տեղեկատվությունը կարող է գերբեռնել փորձագետներին և նվազեցնել գնահատման որակը։</p>
+
+      <div class="example-grid">
+        <div class="example-card">
+          <div class="icon">🏢</div>
+          <p>Կազմակերպչական վերակառուցման ուղղությունները գնահատելիս փորձագետներին տրամադրվում է ոչ միայն ընթացիկ կառուցվածքի նկարագրությունը, այլև նմանատիպ ընկերությունների վերակառուցումների արդյունքների համեմատական տվյալները՝ որպես հենանիշ։</p>
+        </div>
+        <div class="example-card">
+          <div class="icon">📑</div>
+          <p>Ներդրումային նախագծերի առաջնահերթության գնահատման հարցման ժամանակ յուրաքանչյուր նախագծի համար պատրաստվում է ստանդարտացված տեղեկատվական թերթիկ՝ ֆինանսական ցուցանիշներով, ռիսկերով և ռազմավարական համապատասխանությամբ, որպեսզի բոլոր փորձագետները գնահատեն նույն տեղեկատվության հիման վրա։</p>
+        </div>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Փորձագետներին տրվում է ընդամենը մեկ նախադասությամբ ձևակերպված խնդիր՝ «գնահատեք ընկերության ապագան», առանց լրացուցիչ տվյալների, նախապատմության կամ չափանիշների։ Փորձագետները գնահատումն անում են տարբեր ենթադրությունների հիման վրա, ինչի պատճառով կարծիքները դառնում են անհամեմատելի, և հնարավոր չի լինում ձևակերպել միասնական եզրակացություն։</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Փորձաքննության խնդիրների ընտրությունը</h3>
+      <p>Ոչ բոլոր հետազոտական խնդիրներն են հարմար փորձագիտական գնահատման համար։ Դրա կիրառումը հիմնավորված է հետևյալ իրավիճակներում․</p>
+      <ol class="number-list">
+        <li><strong>Բարձր անորոշություն.</strong> խնդիրը վերաբերում է ապագային կամ երևույթների, որոնց վերաբերյալ բավարար վիճակագրական տվյալներ չկան։</li>
+        <li><strong>Բազմաչափանիշայնություն.</strong> խնդիրը ներառում է բազմաթիվ, հաճախ իրար հակասող գործոններ, որոնք դժվար է միասնականորեն գնահատել ֆորմալ մաթեմատիկական մոդելով։</li>
+        <li><strong>Որակական բնույթ.</strong> խնդիրը վերաբերում է դժվար չափելի հասկացությունների՝ հեղինակության, ռազմավարական համապատասխանության կամ կազմակերպչական մշակույթի։</li>
+        <li><strong>Բարձր ռիսկայնություն և կարևորություն.</strong> խնդրի սխալ լուծումը կարող է ունենալ լուրջ հետևանքներ, ինչը հիմնավորում է լրացուցիչ ժամանակի և փորձագետների վարձատրության ծախսերը։</li>
+      </ol>
+      <p>Հետազոտողը չպետք է փորձագիտական գնահատման դիմի այն դեպքերում, երբ խնդիրը կարելի է լիարժեք լուծել առկա քանակական տվյալների ուղղակի վերլուծությամբ։ Փորձագիտական մեթոդը լրացուցիչ մեթոդ է, ոչ թե քանակական վերլուծության փոխարինիչ այն իրավիճակներում, երբ տվյալները բավարար են։</p>
+
+      <div class="example-grid">
+        <div class="example-card">
+          <div class="icon">⚖️</div>
+          <p>Նոր օրենսդրական կարգավորման հնարավոր ազդեցությունը ֆինանսական հատվածի վրա փորձագիտական գնահատման հարմար խնդիր է, քանի որ կարգավորումը դեռ չի ներդրվել, իսկ ազդեցությունը տարբեր ենթաոլորտների վրա կարող է տարբեր լինել։</p>
+        </div>
+        <div class="example-card">
+          <div class="icon">🏷️</div>
+          <p>Կազմակերպության հեղինակության և բրենդային արժեքի գնահատումը հարմար է փորձագիտական մեթոդների համար, քանի որ այդ հասկացությունները դժվար է ուղղակիորեն չափել քանակական ցուցանիշներով և պահանջում են ոլորտի մասնագետների որակական դատողություն։</p>
+        </div>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Հետազոտողը փորձագիտական հարցման միջոցով փորձում է պարզել ընկերության նախորդ տարվա վաճառքների ճշգրիտ դինամիկան, թեև այդ տվյալները հասանելի են հաշվապահական հաշվետվություններից։ Փորձագետներ ներգրավելու վրա ժամանակ և ռեսուրսներ են ծախսվում մի հարցի համար, որին կարելի էր ավելի ճշգրիտ պատասխանել առկա փաստաթղթերի հիման վրա։</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic4-q16">
+    <div class="section-heading">
+      <div class="section-index">16</div>
+      <h2>Փորձագիտական գնահատականների օբյեկտիվության և հուսալիության ապահովումը, փորձաքննության փուլերը, չափման ընթացակարգերը և հարցման արդյունքների մշակումը</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>Փորձագիտական գնահատումների հիմնական թույլ կողմը սուբյեկտիվության ռիսկն է։ Հետևաբար հետազոտողը պետք է կիրառի մի շարք միջոցներ՝ արդյունքների օբյեկտիվությունն ու հուսալիությունը բարձրացնելու համար։</p>
+    </div>
+
+    <div class="card">
+      <h3>Օբյեկտիվության և հուսալիության ապահովման միջոցները</h3>
+      <ol class="number-list">
+        <li><strong>Փորձագետների իրավասության գնահատում.</strong> հարցումից առաջ գնահատվում են թեկնածուների որակավորումը, փորձառության տարիները, մասնագիտական ձեռքբերումները և ինքնագնահատականը՝ համոզվելու համար, որ ընտրված անձինք իրավասու են։</li>
+        <li><strong>Փորձագիտական խմբի բազմազանություն.</strong> ներգրավվում են տարբեր տեսանկյուն ունեցող մասնագետներ՝ տարբեր ստորաբաժանումներից և տարբեր փորձառությամբ, որպեսզի նվազի մեկ ընդհանուր կողմնակալության վտանգը։</li>
+        <li><strong>Անանունություն.</strong> հատկապես Դելֆիի մեթոդում անանունությունը նվազեցնում է հեղինակության ազդեցության և խմբային ճնշման ռիսկը։</li>
+        <li><strong>Բազմափուլ գնահատում.</strong> կրկնվող փուլերը փորձագետներին թույլ են տալիս խմբի ընդհանուր դիրքորոշմանը ծանոթանալուց հետո վերանայել սեփական կարծիքը և ավելի հիմնավորված եզրափակիչ գնահատական տալ։</li>
+        <li><strong>Կոնկորդանսի գործակցի հաշվարկ.</strong> այս վիճակագրական ցուցանիշը չափում է փորձագետների կարծիքների համաձայնության աստիճանը։</li>
+      </ol>
+
+      <div class="callout good">
+        <strong>Օրինակ</strong>
+        <p>Կադրային ռեզերվի ձևավորման փորձագիտական գնահատման համար ներգրավվում են ոչ միայն HR ստորաբաժանման աշխատակիցներ, այլև գծային ղեկավարներ ու արտաքին խորհրդատուներ։ Տեսակետների բազմազանությունը նվազեցնում է ներքին քաղաքականության ազդեցությունը գնահատականների վրա։</p>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Փորձագիտական խումբն ընտրվում է բացառապես մեկ ստորաբաժանումից կամ մեկ հիերարխիկ մակարդակից, օրինակ՝ միայն ավագ ղեկավարներից։ Արդյունքները չեն արտացոլում կազմակերպության իրական բազմազանությունը և կարող են կրել համակարգված կողմնակալություն, որը հնարավոր չէ շտկել միայն վիճակագրական մեթոդներով։</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Փորձաքննության փուլերը</h3>
+      <p>Փորձագիտական հետազոտությունն անցնում է վեց հաջորդական փուլով։</p>
+      <ol class="number-list">
+        <li><strong>Խնդրի ձևակերպում.</strong> հստակ սահմանվում են հետազոտության նպատակը և կոնկրետ հարցերը, որոնց պետք է պատասխանեն փորձագետները։</li>
+        <li><strong>Փորձագիտական խմբի ձևավորում.</strong> նպատակը հազարավոր մարդկանց կարծիքը ներկայացնելը չէ, այլ որոշակի ոլորտում գիտելիք, փորձ և մասնագիտական իրավասություն ունեցող անձանց գնահատականների հիման վրա հիմնավորված եզրակացություն ստանալը։ Փորձագիտական հարցման ընտրանքի բավարարությունը սովորաբար չի գնահատվում զանգվածային հարցումների 95%/±5% տրամաբանությամբ։ Առաջնային են փորձագետների իրավասությունը, ընտրանքի նպատակահարմարությունը և կարծիքների համաձայնության մակարդակը։ Խմբի քանակական կազմը որոշվում է՝ հաշվի առնելով պահանջվող հավաստիությունը և թույլատրելի սխալը։ Գործնականում նվազագույն շեմ է համարվում 9–10 փորձագետը, իսկ սովորաբար ընտրվում է 20–30 փորձագետ։ Կարևոր է նաև տեսակետների բազմազանությունը․ մեծ, բայց միակողմանի խումբը կարող է կեղծ տպավորություն ստեղծել լայն համաձայնության մասին։</li>
+        <li><strong>Ընթացակարգի ընտրություն.</strong> որոշվում է, թե փորձագիտական չափման որ մեթոդն է կիրառվելու։</li>
+        <li><strong>Հարցման անցկացում.</strong> հարցումն իրականացվում է ընտրված ընթացակարգով՝ մեկ կամ մի քանի փուլով։</li>
+        <li><strong>Արդյունքների մշակում.</strong> հավաքագրված գնահատականները վիճակագրորեն մշակվում են։</li>
+        <li><strong>Եզրակացության ձևակերպում.</strong> մշակված արդյունքները վերածվում են հասկանալի, կիրառելի եզրակացությունների և առաջարկությունների։</li>
+      </ol>
+      <p>Փուլերը միշտ չէ, որ ընթանում են խիստ գծային։ Օրինակ՝ եթե պարզվում է, որ խնդիրը սխալ է ձևակերպված, հետազոտողը կարող է վերադառնալ և վերաձևակերպել այն, նույնիսկ փորձագիտական խմբի ձևավորումից հետո։</p>
+
+      <div class="callout good">
+        <strong>Օրինակ</strong>
+        <p>Նոր տեխնոլոգիայի ներդրման որոշման ուսումնասիրության ժամանակ հետազոտողը հետևում է վեց փուլերին՝ սկսելով հարցի հստակ ձևակերպումից՝ «որքանո՞վ է այս տեխնոլոգիան հարմար մեր ընկերության համար առաջիկա երեք տարվա ընթացքում», և ավարտելով փորձագետների կոնսենսուսի վրա հիմնված առաջարկությամբ։</p>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Հետազոտողն անմիջապես անցնում է հարցմանը՝ բաց թողնելով խնդրի հստակ ձևակերպումը և ենթադրելով, որ փորձագետներն ինքնուրույն կհասկանան պահանջը։ Փորձագետները առաջադրանքը տարբեր կերպ են մեկնաբանում, ու գնահատականները սկզբից անհամեմատելի են լինում։ Խնդիրը կարող է բացահայտվել միայն արդյունքների մշակման փուլում, երբ արդեն ուշ է գործընթացը շտկելու համար։</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Փորձագիտական չափման ընթացակարգերը</h3>
+      <p>Փորձագիտական գնահատումների կարևոր հարցերից մեկն այն է, թե ինչպես են մասնակիցներն արտահայտում իրենց կարծիքը։ Առանձնացվում է չորս հիմնական ընթացակարգ։</p>
+      <ol class="number-list">
+        <li><strong>Դասակարգում (ranking).</strong> փորձագետը օբյեկտները՝ այլընտրանքները կամ գործոնները, դասավորում է նախապատվության հերթականությամբ՝ 1-ից մինչև N։ Մեթոդը պարզ է, բայց չի ցույց տալիս, թե տարբերությունն ինչ չափի է։</li>
+        <li><strong>Զուգակցված համեմատություն (paired comparison).</strong> փորձագետին ներկայացվում են օբյեկտների զույգեր, և նա յուրաքանչյուր զույգում ընտրում է նախընտրելի տարբերակը։ Մեթոդն ավելի մանրամասն է, բայց N օբյեկտի դեպքում պահանջվում է N(N−1)/2 համեմատություն։</li>
+        <li><strong>Հաջորդական համեմատություն (successive comparison).</strong> սկզբում փորձագետը դասակարգում է օբյեկտները, ապա դրանց տալիս է թվային կշիռներ և համեմատության միջոցով ճշգրտում կշիռները՝ համոզվելու համար, որ դրանք համապատասխանում են իր իրական նախապատվություններին։</li>
+        <li><strong>Ուղղակի գնահատում (direct estimation).</strong> փորձագետը օբյեկտին անմիջապես վերագրում է թվային արժեք՝ նախապես սահմանված սանդղակով, օրինակ՝ 1-ից 10, առանց պարտադիր համեմատելու մյուս օբյեկտների հետ։</li>
+      </ol>
+
+      <div class="example-grid">
+        <div class="example-card">
+          <div class="icon">🏆</div>
+          <p>Ռազմավարական նպատակների առաջնահերթությունները որոշելիս վեց փորձագետներից յուրաքանչյուրը հինգ ուղղություն է դասակարգում ըստ կարևորության, ապա գնահատականները միավորվում են ընդհանուր առաջնահերթությունների ցանկում։</p>
+        </div>
+        <div class="example-card">
+          <div class="icon">🤝</div>
+          <p>Երկու այլընտրանքային մատակարարների՝ գնի, որակի և հուսալիության համեմատության համար կիրառվում է զուգակցված համեմատություն։</p>
+        </div>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Զուգակցված համեմատությունն օգտագործվում է 15 այլընտրանքի համար։ Մեկ փորձագետից պահանջվում է 105 առանձին համեմատություն։ Հարցման երկարությունը կարող է հոգնեցնել փորձագետներին և նվազեցնել ուշադրությունն ու գնահատականների որակը։ Այս իրավիճակում կարող են ավելի հարմար լինել ուղղակի գնահատումը կամ դասակարգումը։</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Փորձագիտական հարցման արդյունքների մշակումը</h3>
+      <ol class="number-list">
+        <li><strong>Ագրեգացում.</strong> անհատական գնահատականները միավորվում են ընդհանուր ցուցանիշի մեջ, օրինակ՝ միջին թվաբանականի, միջին կշռվածի կամ միջին կարգային արժեքի տեսքով։</li>
+        <li><strong>Համաձայնության գործակցի հաշվարկ.</strong> կոնկորդանսի գործակիցը ցույց է տալիս փորձագետների կարծիքների համընկնման աստիճանը։ Այն տատանվում է 0-ից՝ լրիվ անհամաձայնություն, մինչև 1՝ լրիվ համաձայնություն։ Ցածր համաձայնությունը կարող է վկայել խնդրի բարձր անորոշության կամ խմբի ոչ միատարրության մասին։</li>
+        <li><strong>Շեղումների վերլուծություն.</strong> բացահայտվում են այն գնահատականները, որոնք էապես տարբերվում են խմբի ընդհանուր դիրքորոշումից։ Դրանց պետք է գնահատել ոչ միայն վիճակագրորեն, այլև ուսումնասիրել փորձագետի մասնագիտական պրոֆիլը և շեղման հնարավոր պատճառները՝ ապա որոշել՝ պահպանե՞լ կարծիքը, առանձին քննարկե՞լ, թե՞ բացառել։</li>
+        <li><strong>Վիճակագրական նշանակալիության ստուգում.</strong> կոլեկտիվ գնահատումների դեպքում ստուգվում է՝ արդյոք տարբերությունները, օրինակ՝ երկու այլընտրանքի միջև, վիճակագրորեն նշանակալի են, թե կարող են պատահական լինել։</li>
+      </ol>
+
+      <div class="callout">
+        <strong>Քենդալի համաձայնության գործակիցը (Kendall’s W)</strong>
+        <p>Քենդալի W-ն օգտագործվում է փորձագետների դասակարգումների համաձայնության աստիճանը գնահատելու համար։ Այն հաշվարկվում է՝ հաշվի առնելով փորձագետների թիվը, գնահատվող օբյեկտների թիվը և դասակարգումների շեղումների քառակուսիների գումարը։</p>
+        <p style="margin-top:8px">Այստեղ՝ <strong>W</strong>՝ համաձայնության գործակիցն է, <strong>m</strong>՝ փորձագետների թիվը, <strong>n</strong>՝ գնահատվող օբյեկտների կամ գործոնների թիվը, <strong>S</strong>՝ համապատասխան շեղումների քառակուսիների գումարը։</p>
+        <p style="margin-top:8px">W-ի մեկնաբանման մոտավոր ուղենիշներ՝ W ≈ 0՝ շատ թույլ համաձայնություն, W ≈ 0.3՝ թույլից միջին համաձայնություն, W ≈ 0.5՝ միջին համաձայնություն, W ≈ 0.7՝ բարձր համաձայնություն, W ≈ 1՝ շատ բարձր համաձայնություն։</p>
+        <p style="margin-top:8px">Փորձագիտական հարցման դեպքում երբեմն ավելի կարևոր է ոչ թե հարցվածների թիվը, այլ այն, թե որքանով են մասնագետների գնահատականները համահունչ։</p>
+      </div>
+
+      <p>Արդյունքների մշակումը չպետք է սահմանափակվի միայն միջին արժեքի հաշվարկով․ անհրաժեշտ է գնահատել նաև կոնկորդանսի աստիճանը, քանի որ այն ցույց է տալիս՝ որքանով կարելի է վստահել ագրեգացված գնահատականին։ Եթե համաձայնությունը ցածր է, նպատակահարմար է անցկացնել լրացուցիչ քննարկման կամ պարզաբանման փուլ՝ ոչ թե անմիջապես ներկայացնել անվստահելի եզրակացությունը։</p>
+
+      <div class="callout good">
+        <strong>Օրինակ</strong>
+        <p>Ներդրումային նախագծերի առաջնահերթությունները գնահատելուց հետո հետազոտողը հաշվարկում է կոնկորդանսի գործակիցը և ստանում 0.82 արժեք։ Բարձր համաձայնությունը հիմք է տալիս միջին կարգային արժեքներն օգտագործել որպես վերջնական առաջնահերթությունների ցանկ։</p>
+      </div>
+
+      <div class="callout bad">
+        <strong>Սխալ մոտեցում և հետևանք</strong>
+        <p>Հետազոտողը հաշվարկում է միայն միջին թվաբանական արժեքը՝ առանց փորձագետների համաձայնությունը ստուգելու, և արդյունքները ներկայացնում է որպես միասնական դիրքորոշում։ Եթե իրականում կարծիքները խիստ տարասեռ են, միջին արժեքը կեղծ պատկեր է ստեղծում կոնսենսուսի մասին, և որոշումը չի արտացոլում փորձագիտական խմբի իրական դիրքորոշումը։</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic4-q17">
+    <div class="section-heading">
+      <div class="section-index">17</div>
+      <h2>Կոլեկտիվ փորձագիտական գնահատումների մեթոդները</h2>
+    </div>
+
+    <div class="card lead-card">
+      <p>Ի տարբերություն անհատական փորձագիտական հարցման՝ կոլեկտիվ մեթոդները ներառում են փորձագետների ուղղակի կամ միջնորդավորված փոխազդեցություն՝ ընդհանուր դիրքորոշման ձևավորման նպատակով։ Հիմնական կոլեկտիվ մեթոդներն են ուղեղների գրոհը, բանավեճի մեթոդը, Դելֆիի մեթոդը և նոմինալ խմբային մեթոդը։</p>
+    </div>
+
+    <div class="card">
+      <h3>1. Ուղեղների գրոհ (brainstorming)</h3>
+      <p>Ուղեղների գրոհը խմբային քննարկում է, որի նպատակն է հնարավորինս շատ գաղափարներ առաջացնել՝ ժամանակավորապես հրաժարվելով քննադատությունից։ Դրանից հետո առանձին փուլում գաղափարները գնահատվում և ընտրվում են։ Մեթոդը հիմնվում է կոլեկտիվ գործունեության հոգեբանական օրինաչափությունների վրա։ Մարդու ստեղծագործ ակտիվությունը կարող է սահմանափակվել հոգեբանական, հաղորդակցական, սոցիալական և դաստիարակչական խոչընդոտներով։</p>
+      <p>Մեթոդի նպատակն է գաղափարների գեներացման ընթացքում չանցնել դրանց վերլուծության կամ գնահատման։ Հաջողությունը հիմնվում է երկու սկզբունքի վրա․</p>
+      <ul class="bullet-list">
+        <li>խումբը համատեղ աշխատանքի արդյունքում կարող է ավելի որակյալ գաղափարներ առաջադրել, քան նույն մասնակիցներն առանձին աշխատելիս,</li>
+        <li>գաղափարների գեներացման փուլում վաղաժամ սուբյեկտիվ գնահատականը կարող է արգելափակել ստեղծագործական մտածողությունը։</li>
+      </ul>
+
+      <h3 style="margin-top:18px">Մասնակիցների կանոնները</h3>
+      <ul class="bullet-list">
+        <li>Մասնակիցները դեմ դիմաց նստում են սեղանի շուրջ։</li>
+        <li>Բանավեճը, քննարկումը և հնչած մտքերի գնահատումը արգելվում են գեներացման փուլում։</li>
+        <li>Մասնակցի ելույթի տևողությունը 1–2 րոպե է։</li>
+        <li>Արտահայտվում են բոլոր մտքերը, այդ թվում՝ առաջին հայացքից անհեթեթ թվացողները։</li>
+        <li>Գաղափարների քանակն ավելի կարևոր է, քան դրանց որակը։</li>
+      </ul>
+
+      <h3 style="margin-top:18px">Ցուցումներ</h3>
+      <ul class="bullet-list">
+        <li>Խմբին ներկայացվում է խնդրի ընդհանուր բնութագիրը՝ առանց լուծման տարբերակները նախապես սահմանափակելու։</li>
+        <li>Նոր գաղափարներն ընդունվում են հավանությամբ։</li>
+        <li>Պետք է հավատալ խնդրի լուծելիությանը։</li>
+        <li>Թույլատրվում են հարցեր, որոնք կօգնեն զարգացնել միտքը։</li>
+        <li>Մասնակիցները խրախուսվում են ձգտել առաջադրված խնդրի լուծմանը։</li>
+        <li>Բոլոր մասնակիցներն ունեն հավասար իրավունքներ։</li>
+        <li>Գաղափարների գեներացման փուլում կարիք չկա կենտրոնանալու դրանց հնարավոր հետևանքների վրա։</li>
+        <li>Չի թույլատրվում ուշադրությունը շեղող կողմնակի զրույցը, փսփսոցը կամ ժեստերը։</li>
+      </ul>
+
+      <p>Ղեկավարը կարգավորում է քննարկումը, տալիս է նպաստող հարցեր, անհրաժեշտության դեպքում հումոր է օգտագործում և ոչ պաշտոնական մթնոլորտ ստեղծում։</p>
+
+      <h3 style="margin-top:18px">Սահմանափակումներ և պայմաններ</h3>
+      <ul class="bullet-list">
+        <li>Մասնակիցների քանակը՝ 4–15։</li>
+        <li>Ցանկալի է, որ մասնակիցներն ունենան կրթության և մասնագիտացման տարբեր աստիճաններ։</li>
+        <li>Պետք է պահպանել ակտիվության և խանդավառության հավասարակշռությունը։</li>
+        <li>Աշխատանքի տևողությունը՝ 15 րոպեից մինչև 1 ժամ։</li>
+      </ul>
+
+      <p>Գաղափարներն ընտրվում են փորձագետների կողմից՝ գնահատման երկու փուլով։ Սկզբում առանձնացվում են առավել յուրահատուկ և ռացիոնալ մտքերը, այնուհետև դրանցից ընտրվում են օպտիմալները՝ հաշվի առնելով խնդիրը և դրա լուծման նպատակը։ Արդյունքում կազմվում է առաջարկությունների ցուցակ, որտեղ գաղափարները դասակարգվում են ըստ սահմանված պարամետրերի, սահմանափակումների և արդյունավետության։ Վերլուծությունը կարող է կատարվել նաև քննարկման ձայնագրությունները կենտրոնացված կարգով լսելով։</p>
+    </div>
+
+    <div class="card">
+      <h3>2. Բանավեճի մեթոդ</h3>
+      <p>Բանավեճի մեթոդը նման է ուղեղների գրոհին, բայց պահանջում է հնչեցված կարծիքների պարտադիր հիմնավորում և քննադատական քննարկում։ Այս ձևաչափի նպատակը նոր մտքեր գեներացնելը չէ, այլ գոյություն ունեցող գաղափարները քննադատորեն քննարկելը։</p>
+
+      <h3 style="margin-top:18px">Կանոններ մասնակիցների համար</h3>
+      <ul class="bullet-list">
+        <li>Յուրաքանչյուր միտք քննադատվում, քննարկվում և գնահատվում է ըստ չափանիշների՝ սկզբնական պահանջներին համապատասխանություն, իրականացման հնարավորություն կամ դրա բացակայություն, ինչպես նաև կատարման ծախսեր և հնարավոր այլընտրանքային կիրառություններ։</li>
+        <li>Քննադատությունները շարադրվում են հակիրճ և կառուցողական։ Երկար քննարկում պահանջող մտքերը դիտարկվում են ավելի ուշ։</li>
+        <li>Յուրաքանչյուր մասնակից կարող է մի քանի անգամ ելույթ ունենալ, սակայն նպատակահարմար է հերթով խոսել։</li>
+        <li>Մեկ ելույթի տևողությունը 15–20 րոպե է։</li>
+        <li>Ցանկալի է քննարկումն անցկացնել օրվա առաջին կեսին՝ հանգիստ պայմաններում։</li>
+      </ul>
+
+      <p>Բանավեճը կարող է անցկացվել ուղեղների գրոհից հետո․ մտքերի կոլեկտիվ գեներացմանը հաջորդում է գաղափարների և հակափաստարկների քննադատական քննարկումը։ Այդ ընթացքում՝</p>
+      <ul class="bullet-list">
+        <li>գաղափարները դասակարգվում, համակարգվում և խմբավորվում են,</li>
+        <li>առանձնացվում են խնդրի լուծման ընդհանուր մոտեցումները,</li>
+        <li>գաղափարները գնահատվում են ըստ իրագործելիության, և բացահայտվում են խոչընդոտները,</li>
+        <li>գնահատվում են քննադատական դիտողությունները, հավաքագրվում են քննադատությանը դիմացած գաղափարներն ու հակափաստարկները։</li>
+      </ul>
+
+      <p>Նպատակահարմար է մասնակիցներին բաժանել մտքերի գեներատորների, խնդրային իրավիճակները վերլուծողների ու գաղափարները գնահատողների, ինչպես նաև հակափաստարկներ առաջադրողների խմբերի։</p>
+
+      <h3 style="margin-top:18px">Մեթոդի սկզբունքները</h3>
+      <ul class="bullet-list">
+        <li>որոշումների որոնման ընթացքում փոխազդեցություն,</li>
+        <li>մասնակիցների ստեղծագործական հնարավորությունների նկատմամբ վստահություն,</li>
+        <li>ինտուիտիվ և տրամաբանական մտածողության օպտիմալ համադրում․ մտքերի գեներացման պահին քննադատության սահմանափակումը նպաստում է ստեղծագործական մտածողությանը, իսկ առանձին փուլում իրականացվում է դրանց քննադատական վերլուծությունը։</li>
+      </ul>
+
+      <h3 style="margin-top:18px">Մեթոդի առանձնահատկություններն ու թերությունները</h3>
+      <p><strong>Առանձնահատկություններ․</strong></p>
+      <ul class="bullet-list">
+        <li>կառավարման մասնագետների կողմից բոլոր ներկաների ներգրավման հնարավորություն,</li>
+        <li>սոցիալ-հոգեբանական ներխմբային գործընթացների կատարելագործում։</li>
+      </ul>
+      <p><strong>Թերություններ․</strong></p>
+      <ul class="bullet-list">
+        <li>կարող է առաջացնել ընդհանուր գաղափար, բայց չի երաշխավորում դրա մանրակրկիտ մշակումը,</li>
+        <li>հարմար չէ մեծածավալ հաշվարկներ պահանջող խնդիրների լուծման համար,</li>
+        <li>պահանջում է լավ պատրաստված ղեկավար, որը տիրապետում է խմբային աշխատանքի, հոգեբանական և կազմակերպչական հմտությունների,</li>
+        <li>միշտ չէ, որ հնարավոր է հաղթահարել մտածողության իներցիան։</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>3. Դելֆիի մեթոդ</h3>
+      <p>Դելֆիի մեթոդը փորձագետների անանուն, բազմափուլ հարցում է։ Յուրաքանչյուր փուլից հետո մասնակիցներին տրամադրվում է խմբի ընդհանուր դիրքորոշման ամփոփ, անանուն հետադարձ կապ։ Սա փորձագետներին թույլ է տալիս աստիճանաբար մոտենալ համաձայնության՝ առանց հեղինակության ճնշման կամ խմբային մտածողության ռիսկի։</p>
+      <p>Մեթոդի նպատակն է փորձագիտական խմբից ստանալ բարձր հավաստիությամբ համաձայնեցված տեղեկատվություն և մեղմել այն հակասությունները, որոնք առաջանում են փորձագետների խմբային աշխատանքի ժամանակ։ Անհատական, անջատ հարցումների դեպքում գնահատականները կարող են խիստ տարբերվել, իսկ բաց քննարկման դեպքում հեղինակավոր մասնագետների կարծիքները կարող են պարտադրվել ամբողջ խմբին։ Դելֆիի մեթոդը խուսափում է այդ խնդիրներից՝ կարծիքները փոխանակելով միջնորդավորված կերպով՝ առանց փորձագետների անմիջական շփման։</p>
+      <p>Ընթացակարգը բաղկացած է մի քանի փուլից․</p>
+      <ol class="number-list">
+        <li>Խմբի անդամներին առաջարկվում է պատասխանել ուսումնասիրվող խնդրի վերաբերյալ մանրամասն ձևակերպված հարցերին։</li>
+        <li>Յուրաքանչյուր փորձագետ պատասխանում է անհատապես և անանուն։</li>
+        <li>Պատասխանները հավաքվում են կենտրոնում և դրանց հիման վրա կազմվում է փաստաթուղթ, որը ներառում է առաջարկված լուծումները։</li>
+        <li>Խմբի յուրաքանչյուր անդամ ստանում է փաստաթղթի օրինակը։</li>
+        <li>Մյուսների կարծիքներին ծանոթանալուց հետո փորձագետը կարող է փոխել իր առաջարկը։</li>
+        <li>Վերջին երկու քայլերը կրկնվում են այնքան, մինչև ստացվի համաձայնեցված տարբերակ կամ որոշվի, որ լրացուցիչ փուլերի կարիք չկա։</li>
+      </ol>
+      <p>Դելֆիի մեթոդը հաճախ կիրառվում է, երբ հնարավոր չէ հավաքել փորձագիտական խումբը մեկ վայրում։ Փորձագետներին արգելվում է հանդիպել և անմիջականորեն կարծիքներ փոխանակել։ Դրա թերությունն այն է, որ բազմափուլ գործընթացը կարող է զգալիորեն մեծացնել հետազոտության տևողությունը։</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Նոմինալ խմբային մեթոդ</h3>
+      <p>Նոմինալ խմբային մեթոդի հիմնական գաղափարն այն է, որ մասնակիցները սկզբում ինքնուրույն և լուռ ձևակերպում են իրենց գաղափարները, այնուհետև հերթականությամբ ներկայացնում են ամբողջ խմբին, քննարկում և վերջում գնահատում կամ դասակարգում են ըստ կարևորության։ Մեթոդը կոչվում է «նոմինալ» խումբ, քանի որ մասնակիցները նույն խմբում են, բայց գաղափարների սկզբնական առաջադրման փուլում նրանց անմիջական փոխազդեցությունը սահմանափակված է։ Այդ փուլում խումբը գործում է որպես անհատների համախումբ, ոչ թե ազատ քննարկում իրականացնող ավանդական խումբ։</p>
+
+      <h3 style="margin-top:18px">Մեթոդի փուլերը</h3>
+      <ol class="number-list">
+        <li><strong>Խնդրի հստակ ձևակերպում.</strong> կազմակերպիչը կամ վարողը ձևակերպում է այն հարցը, որի վերաբերյալ խումբը պետք է գաղափարներ առաջարկի։ Հարցը պետք է լինի հստակ, հասկանալի, կոնկրետ և բոլոր մասնակիցների համար միանշանակ։ Չափազանց լայն հարցը կարող է առաջացնել շատ տարբեր ուղղություններով առաջարկներ և դժվարացնել հետագա գնահատումը։</li>
+        <li><strong>Գաղափարների անհատական և լուռ գեներացում.</strong> որոշակի ժամանակահատվածում յուրաքանչյուր մասնակից ինքնուրույն գրում է իր գաղափարները։ Քննարկում չի անցկացվում։ Սա հատկապես կարևոր է, երբ խմբում կան հեղինակավոր կամ ղեկավար պաշտոն զբաղեցնող անձինք, որոնց կարծիքը կարող է ազդել մյուսների վրա։</li>
+        <li><strong>Գաղափարների ներկայացում.</strong> մասնակիցները հերթով ներկայացնում են իրենց առաջարկներից մեկը, իսկ վարողը դրանք գրանցում է ընդհանուր ցուցակում։ Սկզբնական փուլում գաղափարները պարզապես հավաքվում են և չեն քննադատվում։</li>
+        <li><strong>Գաղափարների պարզաբանում և քննարկում.</strong> պարզաբանվում է առաջարկների բովանդակությունը, անհրաժեշտության դեպքում միավորվում են նման գաղափարները, վերացվում կրկնությունները և ճշգրտվում ձևակերպումները։ Վարողը պետք է թույլ չտա, որ քննարկումը վերածվի անձնական վեճի կամ որևէ մասնակցի գաղափարի ճնշման։</li>
+        <li><strong>Գաղափարների գնահատում և դասակարգում.</strong> վերջնական փուլում մասնակիցները գնահատում կամ դասակարգում են առաջարկները։</li>
+      </ol>
+
+      <h3 style="margin-top:18px">Մեթոդի թերությունները</h3>
+      <ul class="bullet-list">
+        <li>Կառուցված և ժամանակային սահմանափակումներ ունեցող աշխատանքի պատճառով որոշ բարդ հարցեր կարող են ամբողջությամբ չքննարկվել։</li>
+        <li>Եթե խմբում չկան համապատասխան մասնագետներ կամ շահագրգիռ կողմեր, արդյունքները կարող են չարտացոլել խնդրի ամբողջական պատկերը։</li>
+        <li>Ամենաշատ ձայներ ստացած տարբերակը պարտադիր չէ, որ գիտական կամ տնտեսական տեսանկյունից լավագույնը լինի։</li>
+      </ul>
+    </div>
+
+    <div class="example-grid">
+      <div class="example-card">
+        <div class="icon">🔮</div>
+        <p>Երկարաժամկետ տեխնոլոգիական կանխատեսման համար կիրառվում է Դելֆիի մեթոդ։ Երեք փուլից հետո փորձագետների կարծիքները մոտենում են իրար, և համաձայնության գործակիցն աճում է 0.4-ից մինչև 0.75, ինչը հիմք է տալիս ձևակերպելու ավելի համաձայնեցված կանխատեսում։</p>
+      </div>
+      <div class="example-card">
+        <div class="icon">💡</div>
+        <p>Նոր արտադրանքի հայեցակարգ մշակելիս բազմազան մասնագետների խմբով անցկացվում է ուղեղների գրոհ, որին հաջորդում է առանձին, կառուցվածքային փուլ՝ գաղափարները գնահատելու և իրագործելիությամբ առաջնահերթացնելու համար։</p>
+      </div>
+    </div>
+
+    <div class="callout bad">
+      <strong>Սխալ մոտեցում և հետևանք</strong>
+      <p>Հետազոտողը կազմակերպում է բաց, ոչ անանուն խմբային քննարկում, որին մասնակցում են և՛ ընկերության գլխավոր տնօրենը, և՛ կրտսեր մասնագետները՝ ակնկալելով ազատ կարծիքների փոխանակում։ Հիերարխիկ ճնշման պատճառով կրտսեր մասնագետները կարող են համաձայնել տնօրենի կարծիքին՝ անկախ սեփական դիրքորոշումից։ Սա խմբային մտածողության դրսևորում է․ արդյունքը փաստացի արտացոլում է մեկ անձի կարծիքը, սակայն ներկայացվում է որպես կոլեկտիվ փորձագիտական եզրակացություն։</p>
+    </div>
+  </section>
+
+  <div class="footer-note">Թեմա 4 · Փորձագիտական գնահատումների մեթոդները կառավարման համակարգերի հետազոտությունում</div>
+</div>
+
+      <div id="topic4-1" class="topic-content" hidden>
+  <header class="hero">
+    <span class="hero-label">Թեմա 4.1 · Դասախոսության նյութ</span>
+    <h1>Հատուկ քանակական մեթոդները էմպիրիկ հետազոտություններում</h1>
+    <p>Քանակական հետազոտությունը ուսումնասիրվող երևույթների, դրանց միջև կապերի և օրինաչափությունների ուսումնասիրությունն է թվային տվյալների հավաքագրման, չափման ու վերլուծության միջոցով։</p>
+  </header>
+
+  <section class="content-section" id="topic41-intro">
+    <div class="section-heading">
+      <div class="section-index">Ն</div>
+      <h2>Ներածություն</h2>
+    </div>
+    <div class="card lead-card">
+      <p>Քանակական հետազոտության նպատակն է ուսումնասիրվող երևույթները, դրանց միջև առկա կապերը և օրինաչափությունները բացահայտել թվային տվյալների հավաքագրման, չափման և վերլուծության միջոցով։ Ի տարբերություն զուտ նկարագրական ուսումնասիրության՝ քանակական հետազոտությունը հնարավորություն է տալիս ստուգել տեսական ենթադրությունները, գնահատել փոփոխականների միջև կապերի բնույթը, համեմատել տարբեր խմբեր, չափել արդյունավետությունը և բացահայտել այն գործոնները, որոնք կարող են պայմանավորել ուսումնասիրվող արդյունքները։</p>
+      <p>Կիրառվող մեթոդի ընտրությունը կախված է հետազոտական հարցից, տվյալների կառուցվածքից, փոփոխականների չափման մակարդակից և ակնկալվող արդյունքից։ Տնտեսական աճի վրա ներդրումների ազդեցության գնահատումը, համայնքների արդյունավետության համեմատությունը, բնակչության ֆինանսական վարքագծի ուսումնասիրությունը և տնտեսական զարգացման բազմաչափ գնահատումը տարբեր խնդիրներ են և պահանջում են տարբեր վերլուծական մոտեցումներ։</p>
+      <p>Տնտեսական և սոցիալական երևույթները հաճախ բազմագործոն են, ուստի մեկ ցուցանիշը կամ փոփոխականների միջև պարզ կապի գնահատումը կարող է բավարար չլինել։ Այդ պատճառով կիրառվում են ռեգրեսիոն մոդելներ, բազմաչափ վիճակագրական մեթոդներ, կառուցվածքային հավասարումների մոդելավորում, արդյունավետության գնահատման մեթոդներ և այլ գործիքներ։</p>
+      <p>Քանակական հետազոտության մեթոդաբանությունը ներառում է ոչ միայն մոդելի ընտրությունը, այլև տվյալների որակի ստուգումը, մոդելի ենթադրությունների գնահատումը, արդյունքների հուսալիության ու կայունության ստուգումները և արդյունքների գիտականորեն հիմնավորված մեկնաբանությունը։ Այս փուլերը փոխկապակցված են և ապահովում են հետազոտության ամբողջականությունը։</p>
+    </div>
+  </section>
+
+  <section class="content-section" id="topic41-data">
+    <div class="section-heading">
+      <div class="section-index">1</div>
+      <h2>Տվյալների կառուցվածքը, ռեգրեսիոն վերլուծությունը և բազմաչափ քանակական մեթոդները</h2>
+    </div>
+
+    <div class="card">
+      <h3>1. Տվյալների կառուցվածքը և դրա նշանակությունը քանակական վերլուծության մեջ</h3>
+      <p>Քանակական մեթոդի ընտրության առաջին պայմաններից մեկը տվյալների կառուցվածքի որոշումն է։ Նույն հետազոտական հարցը կարող է պահանջել տարբեր մեթոդաբանական մոտեցումներ՝ կախված նրանից, թե տվյալները վերաբերում են տարբեր միավորների մեկ ժամանակահատվածում, մեկ միավորի տարբեր ժամանակահատվածներում, թե բազմաթիվ միավորների՝ ժամանակի ընթացքում։</p>
+      <p>Տվյալների հիմնական կառուցվածքներն են խաչաձև տվյալները, ժամանակային շարքերը և պանելային տվյալները։</p>
+    </div>
+
+    <div class="card">
+      <h3>1.1. Խաչաձև տվյալներ (Cross-sectional data)</h3>
+      <p>Խաչաձև տվյալները վերաբերում են բազմաթիվ դիտարկման միավորների՝ մեկ որոշակի ժամանակահատվածում։ Միավորներ կարող են լինել անհատները, տնային տնտեսությունները, կազմակերպությունները, համայնքները կամ երկրները։</p>
+      <p><strong>Օրինակ․</strong> Հայաստանի տարբեր համայնքների սեփական եկամուտների մակարդակն ու բնակչության թվաքանակը 2024 թվականին։ Յուրաքանչյուր համայնք առանձին դիտարկում է, իսկ տվյալները վերաբերում են նույն ժամանակահատվածին։</p>
+      <p>Խաչաձև տվյալները հնարավորություն են տալիս՝</p>
+      <ul class="bullet-list">
+        <li>համեմատել տարբեր միավորների բնութագրերը,</li>
+        <li>բացահայտել ցուցանիշների միջև առկա վիճակագրական կապերը,</li>
+        <li>գնահատել տարբեր գործոնների պայմանական ազդեցությունները,</li>
+        <li>ուսումնասիրել անհատների կամ կազմակերպությունների միջև տարբերությունները։</li>
+      </ul>
+      <p>Սահմանափակումներից մեկն այն է, որ մեկ ժամանակահատվածի դիտարկումները սովորաբար բավարար չեն ժամանակի ընթացքում փոփոխությունների դինամիկան բացահայտելու համար։ Բացի այդ, փոփոխականների միջև հայտնաբերված կապն ինքնին չի ապացուցում պատճառահետևանքային ազդեցություն։</p>
+    </div>
+
+    <div class="card">
+      <h3>1.2. Ժամանակային շարքեր (Time-series data)</h3>
+      <p>Ժամանակային շարքերը ներկայացնում են մեկ դիտարկման միավորի կամ համակարգի ցուցանիշների փոփոխությունները հաջորդական ժամանակահատվածներում։</p>
+      <p><strong>Օրինակ․</strong> Հայաստանի ՀՆԱ-ի, գնաճի, պետական պարտքի կամ գործազրկության մակարդակի տարեկան տվյալները 2000–2025 թվականների ընթացքում։</p>
+      <p>Ժամանակային շարքերի վերլուծությունն օգտագործվում է՝</p>
+      <ul class="bullet-list">
+        <li>ժամանակի ընթացքում փոփոխությունների միտումները բացահայտելու,</li>
+        <li>սեզոնային և ցիկլային տատանումներն ուսումնասիրելու,</li>
+        <li>ցուցանիշների անցյալ արժեքների և ընթացիկ վիճակի կապերը գնահատելու,</li>
+        <li>տնտեսական ցուցանիշների կանխատեսումներ իրականացնելու համար։</li>
+      </ul>
+      <p>Հարակից ժամանակահատվածների դիտարկումները հաճախ փոխկապակցված են․ օրինակ՝ ընթացիկ տարվա գնաճը կարող է կապված լինել նախորդ տարվա գնաճի հետ։ Այդ պատճառով սովորական ռեգրեսիոն մոտեցումների կիրառումը կարող է պահանջել լրացուցիչ ստուգումներ՝ կապված շարքի կայունության, ավտոկոռելյացիայի և ժամանակային դինամիկայի հետ։</p>
+    </div>
+
+    <div class="card">
+      <h3>1.3. Պանելային տվյալներ (Panel data)</h3>
+      <p>Պանելային տվյալները միավորում են խաչաձև և ժամանակային տվյալների առանձնահատկությունները։ Դրանք ներառում են բազմաթիվ դիտարկման միավորներ, որոնց վերաբերյալ տեղեկություններ են հավաքագրվում մի քանի ժամանակահատվածներում։</p>
+      <p><strong>Օրինակ․</strong> Հայաստանի համայնքների սեփական եկամուտների, պետական տրանսֆերտների և ծառայությունների մատուցման արդյունքների տվյալները 2015–2025 թվականների ընթացքում։</p>
+      <p>Պանելային տվյալների առավելությունն այն է, որ հնարավոր է ուսումնասիրել միաժամանակ և՛ միավորների միջև տարբերությունները, և՛ ժամանակի ընթացքում տեղի ունեցող փոփոխությունները։ Դրանք կարող են նաև օգնել վերահսկել որոշ չդիտարկվող առանձնահատկություններ, որոնք ժամանակի ընթացքում համեմատաբար կայուն են։</p>
+      <p>Պանելային տվյալների վերլուծության հիմնական մոտեցումներից են ֆիքսված ազդեցությունների և պատահական ազդեցությունների մոդելները։</p>
+
+      <div class="two-col">
+        <div class="callout">
+          <strong>Ֆիքսված ազդեցությունների մոդել (Fixed Effects Model)</strong>
+          <p>Թույլ է տալիս վերահսկել դիտարկման միավորներին բնորոշ, ժամանակի ընթացքում անփոփոխ առանձնահատկությունները։ Օրինակ՝ համայնքի աշխարհագրական դիրքը կամ պատմականորեն ձևավորված բնութագրերը կարող են ազդել տնտեսական արդյունքների վրա։ Եթե այդ գործոնները ժամանակի ընթացքում չեն փոխվում, ֆիքսված ազդեցությունների մոտեցումը թույլ է տալիս հաշվի առնել դրանց ազդեցությունը՝ առանց յուրաքանչյուր գործոնը առանձին չափելու։</p>
+        </div>
+        <div class="callout">
+          <strong>Պատահական ազդեցությունների մոդել (Random Effects Model)</strong>
+          <p>Ենթադրում է, որ միավորներին բնորոշ չդիտարկվող ազդեցությունները բացատրող փոփոխականների հետ համակարգված կապ չունեն։ Եթե այս ենթադրությունն ընդունելի է, մոդելը կարող է տրամադրել ավելի արդյունավետ գնահատականներ։</p>
+        </div>
+      </div>
+      <p>Այս մոտեցումների ընտրությունը պետք է հիմնավորվի հետազոտության կառուցվածքով և վիճակագրական ենթադրություններով․ դրանք պարզապես փոխարինելի տեխնիկական տարբերակներ չեն։</p>
+    </div>
+
+    <div class="card">
+      <h3>2. Ռեգրեսիոն վերլուծություն</h3>
+      <p>Ռեգրեսիոն վերլուծությունը քանակական հետազոտության հիմնական մեթոդներից է։ Դրա միջոցով գնահատվում է մեկ փոփոխականի և մեկ կամ մի քանի այլ փոփոխականների միջև վիճակագրական կապը։</p>
+      <p>Ռեգրեսիոն մոդելում տարբերակվում են կախյալ և անկախ փոփոխականները։ Կախյալ փոփոխականը ներկայացնում է ուսումնասիրվող արդյունքը, իսկ անկախ փոփոխականները՝ այն գործոնները, որոնց հետ կապը հետազոտողը ցանկանում է գնահատել։</p>
+      <div class="formula-box">
+        <strong>Պարզ գծային ռեգրեսիա</strong>
+        <div class="formula">Y<sub>i</sub> = β<sub>0</sub> + β<sub>1</sub>X<sub>i</sub> + ε<sub>i</sub></div>
+        <p>որտեղ Y-ն կախյալ փոփոխականն է, X-ը՝ անկախ փոփոխականը, β₀-ն՝ հաստատուն անդամը, β₁-ը՝ ռեգրեսիոն գործակիցը, իսկ ε-ն՝ սխալի անդամը, որը ներառում է արդյունքի չբացատրված մասը։</p>
+      </div>
+      <div class="formula-box">
+        <strong>Բազմակի գծային ռեգրեսիա</strong>
+        <div class="formula">Y<sub>i</sub> = β<sub>0</sub> + β<sub>1</sub>X<sub>1i</sub> + β<sub>2</sub>X<sub>2i</sub> + … + β<sub>k</sub>X<sub>ki</sub> + ε<sub>i</sub></div>
+        <p>Այս մոդելը գնահատում է յուրաքանչյուր անկախ փոփոխականի կապը կախյալ փոփոխականի հետ՝ մյուս ներառված փոփոխականների արժեքները հաստատուն պահելու պայմանով։</p>
+      </div>
+      <p><strong>Օրինակ․</strong> կարելի է ուսումնասիրել Հայաստանի համայնքների սեփական եկամուտների և ծառայությունների մատուցման արդյունքների միջև կապը՝ հաշվի առնելով բնակչության թվաքանակը, պետական տրանսֆերտները և տնտեսական ակտիվությունը։</p>
+      <p>Ռեգրեսիոն գործակիցը ցույց է տալիս, թե անկախ փոփոխականի մեկ միավորով փոփոխության հետ միջինում որքանով է փոխվում կախյալ փոփոխականի պայմանական սպասվող արժեքը՝ մյուս փոփոխականներն անփոփոխ պահելու պայմանով։ Գործակցի նշանը ցույց է տալիս կապի ուղղությունը, իսկ մեծությունը՝ գնահատված չափը՝ կախված փոփոխականների չափման միավորներից։</p>
+      <p>Արդյունքները գնահատվում են գործակիցների վիճակագրական նշանակալիության, վստահության միջակայքերի, մոդելի բացատրող կարողության և կիրառված ենթադրությունների պահպանման տեսանկյունից։ Վիճակագրական նշանակալիությունը չպետք է նույնացնել տնտեսական նշանակալիության հետ․ վիճակագրորեն նշանակալի ազդեցությունը կարող է գործնականում փոքր լինել։</p>
+      <p>Ռեգրեսիան ինքնին չի երաշխավորում պատճառահետևանքային մեկնաբանություն։ Դրա համար անհրաժեշտ է հիմնավորել հետազոտական դիզայնը և հաշվի առնել հնարավոր շփոթեցնող գործոնները, հակադարձ պատճառականությունը և փոփոխականների ընտրության խնդիրները։</p>
+    </div>
+
+    <div class="card">
+      <h3>2.1. Ռեգրեսիոն վերլուծության հիմնական խնդիրները</h3>
+      <p>Մոդելը գնահատելուց հետո անհրաժեշտ է ստուգել՝ արդյոք տվյալների կառուցվածքն ու մոդելի ենթադրությունները թույլ են տալիս արդյունքները վստահելի համարել։</p>
+      <ul class="bullet-list">
+        <li><strong>Բազմակոլինեարություն (Multicollinearity).</strong> առաջանում է, երբ անկախ փոփոխականներն իրար հետ ուժեղ գծային կապ ունեն։ Դժվարանում է դրանց առանձին ազդեցությունների գնահատումը, իսկ գործակիցների ստանդարտ սխալները կարող են մեծանալ։ Հաճախ ստուգվում է դիսպերսիայի ինֆլյացիայի գործակցով՝ VIF-ով։</li>
+        <li><strong>Հետերոսկեդաստիկություն (Heteroskedasticity).</strong> առկա է, երբ ռեգրեսիայի սխալի անդամի դիսպերսիան դիտարկումների միջև հաստատուն չէ։ Սա կարող է հանգեցնել ստանդարտ սխալների սխալ գնահատման և անվստահելի վիճակագրական եզրակացությունների։ Կարող են կիրառվել հետերոսկեդաստիկության նկատմամբ կայուն ստանդարտ սխալներ կամ մոդելի այլ բնութագրումներ։</li>
+        <li><strong>Արտանետումներ (Outliers).</strong> դիտարկումներ են, որոնք էապես տարբերվում են տվյալների մեծ մասից։ Դրանք կարող են առաջանալ չափման կամ տվյալների մուտքագրման սխալներից, կամ ներկայացնել իրական, բայց հազվադեպ երևույթներ։ Պետք է պարզել դրանց առաջացման պատճառը և գնահատել ազդեցությունը․ դիտարկումը չի կարելի հեռացնել միայն այն պատճառով, որ այն փոխում է արդյունքը։</li>
+      </ul>
+      <p>Այս խնդիրների ստուգումը տեխնիկական հավելում չէ, այլ հետազոտության որակի ապահովման անհրաժեշտ մաս։</p>
+    </div>
+
+    <div class="card">
+      <h3>3. Գործոնային վերլուծություն և հիմնական բաղադրիչների մեթոդ</h3>
+      <p>Տնտեսական և սոցիալական երևույթները հաճախ չեն կարող ամբողջությամբ արտահայտվել մեկ ցուցանիշով։ Տնտեսական զարգացումը, նորարարական ներուժը, սոցիալական բարեկեցությունը կամ կառավարման որակը բազմաչափ հասկացություններ են։ Երբ հավաքագրվում են բազմաթիվ փոխկապակցված ցուցանիշներ, կարող է անհրաժեշտ լինել բացահայտել դրանց ընդհանուր կառուցվածքը կամ նվազեցնել վերլուծության չափայնությունը։ Այդ նպատակով կիրառվում են հիմնական բաղադրիչների մեթոդը և գործոնային վերլուծությունը։</p>
+    </div>
+
+    <div class="card">
+      <h3>3.1. Հիմնական բաղադրիչների մեթոդ (Principal Component Analysis, PCA)</h3>
+      <p>PCA-ն բազմաչափ վիճակագրական մեթոդ է, որի նպատակն է սկզբնական փոխկապակցված փոփոխականների տեղեկատվությունը ներկայացնել ավելի փոքր թվով նոր փոփոխականների՝ հիմնական բաղադրիչների միջոցով։ Յուրաքանչյուր բաղադրիչ սկզբնական փոփոխականների գծային համադրություն է։</p>
+      <p>Առաջին բաղադրիչը բացատրում է տվյալների ընդհանուր տատանման հնարավորինս մեծ մասը, երկրորդը՝ մնացած տատանման առավելագույն մասը՝ առաջին բաղադրիչի հետ չկապակցված լինելու պայմանով, և այդպես շարունակ։</p>
+      <p>PCA-ի կիրառման հիմնական նպատակներն են՝</p>
+      <ul class="bullet-list">
+        <li>նվազեցնել փոփոխականների թիվը,</li>
+        <li>բացահայտել տվյալների հիմնական կառուցվածքը,</li>
+        <li>նվազեցնել փոխկապակցված ցուցանիշների կրկնվող տեղեկատվությունը,</li>
+        <li>ստեղծել համակցված ցուցիչներ՝ հետագա վերլուծության համար։</li>
+      </ul>
+      <p><strong>Օրինակ․</strong> երկրի նորարարական ներուժը գնահատելիս կարելի է ունենալ հետազոտության և զարգացման ծախսերի, գիտական հրապարակումների, արտոնագրերի, բարձր տեխնոլոգիական արտահանման և հետազոտողների թվի տվյալներ։ PCA-ն կարող է օգնել այս ցուցանիշները ներկայացնել ավելի փոքր թվով հիմնական բաղադրիչներով։</p>
+      <p>Հիմնական բաղադրիչները միշտ չէ, որ ունեն անմիջական տնտեսական մեկնաբանություն։ Դրանց բովանդակությունը պետք է մեկնաբանել՝ հաշվի առնելով սկզբնական փոփոխականների կշիռներն ու համապատասխանությունը։ Եթե փոփոխականները տարբեր չափման միավորներով են արտահայտված, հաճախ նպատակահարմար է դրանք նախապես ստանդարտացնել։ Բաղադրիչների ընտրությունը պետք է հիմնավորվի բացատրված տատանման, մեկնաբանելիության և հետազոտական նպատակի հիման վրա։</p>
+    </div>
+
+    <div class="card">
+      <h3>3.2. Գործոնային վերլուծություն (Factor Analysis)</h3>
+      <p>Գործոնային վերլուծության նպատակն է դիտարկվող փոփոխականների միջև փոխկապակցվածությունը բացատրել ավելի փոքր թվով թաքնված կամ լատենտ գործոնների միջոցով։ Լատենտ գործոնը ուղղակիորեն չի դիտարկվում, բայց ենթադրվում է, որ այն ազդում է մի քանի չափվող ցուցանիշների վրա։</p>
+      <p><strong>Օրինակ․</strong> ֆինանսական գրագիտությունը կարող է գնահատվել բյուջետավորման, խնայողությունների, վարկերի կառավարման և ֆինանսական ռիսկերի ընկալման հարցերի միջոցով։ Պատասխանների միջև կապերը կարող են արտացոլել ընդհանուր լատենտ կառուցվածքը։</p>
+      <p>Գործոնային վերլուծությունն օգտագործվում է՝</p>
+      <ul class="bullet-list">
+        <li>բազմաթիվ ցուցանիշների հիմքում ընկած ընդհանուր գործոնները բացահայտելու,</li>
+        <li>թաքնված կառուցվածքների չափման մոդելներ ձևավորելու,</li>
+        <li>հարցաթերթերի կառուցվածքը ստուգելու,</li>
+        <li>ցուցանիշների խմբավորումն ու մեկնաբանությունը հիմնավորելու համար։</li>
+      </ul>
+      <p>PCA-ն նպատակ ունի սկզբնական տվյալների ընդհանուր տատանումը ներկայացնել նոր բաղադրիչների միջոցով։ Գործոնային վերլուծությունը մոդելավորում է դիտարկվող փոփոխականների համատեղ տատանումը՝ ենթադրվող թաքնված գործոնների միջոցով։ Դրանք կիրառության որոշ ոլորտներում մոտ են, բայց նույնական չեն։ Ընտրությունը կախված է նրանից՝ պետք է նվազեցնել տվյալների չափայնությո՞ւնը, թե բացահայտել թաքնված կառուցվածքները։</p>
+    </div>
+
+    <div class="card">
+      <h3>4. Կառուցվածքային հավասարումների մոդելավորում (Structural Equation Modeling, SEM)</h3>
+      <p>SEM-ը բազմաչափ վերլուծության շրջանակ է, որը մեկ ընդհանուր մոդելում հնարավորություն է տալիս ուսումնասիրել փոփոխականների միջև մի քանի փոխկապակցված հարաբերություններ։ Այն հատկապես օգտակար է, երբ հետազոտողը ցանկանում է վերլուծել ուղղակի և անուղղակի ազդեցություններն ու թաքնված փոփոխականները։</p>
+      <p>SEM-ը սովորաբար ներառում է երկու փոխկապակցված մաս․</p>
+      <ul class="bullet-list">
+        <li><strong>Չափման մոդել.</strong> նկարագրում է, թե ինչպես են դիտարկվող ցուցանիշները կապված լատենտ փոփոխականների հետ։ Օրինակ՝ կազմակերպության կառավարման որակը կարելի է գնահատել թափանցիկության, հաշվետվողականության, որոշումների կայացման և վերահսկողության ցուցանիշներով։</li>
+        <li><strong>Կառուցվածքային մոդել.</strong> նկարագրում է ուսումնասիրվող փոփոխականների միջև ենթադրվող հարաբերությունները։ Օրինակ՝ կառավարման որակն ազդում է նորարարական կարողությունների վրա, իսկ նորարարական կարողություններն իրենց հերթին՝ կազմակերպության արդյունավետության վրա։</li>
+      </ul>
+      <p>Այս կառուցվածքը հնարավորություն է տալիս գնահատել կառավարման որակի՝ արդյունավետության հետ ունեցած ուղղակի կապը և նորարարական կարողությունների միջոցով ունեցած անուղղակի կապը։</p>
+      <p>SEM-ը կիրառվում է սոցիալական գիտություններում, կառավարման, տնտեսագիտության, կրթության և այլ ոլորտներում, երբ տեսական մոդելը ներառում է մի քանի փոխկապակցված կառուցվածքներ։ Մոդելի բարդությունն ինքնին չի երաշխավորում հետազոտության որակը․ անհրաժեշտ են տեսականորեն հիմնավորված մոդել, համապատասխան տվյալներ, չափման գործիքների ստուգում և մոդելի համապատասխանության գնահատում։ Ստացված կապերն ինքնաբերաբար չեն ապացուցում պատճառականություն։</p>
+    </div>
+
+        <div class="card">
+      <h3>5. Երկընտրանքային արդյունքների մոդելավորում․ Logit և Probit</h3>
+      <p>Դասական գծային ռեգրեսիան հիմնականում կիրառվում է շարունակական կախյալ փոփոխականների համար։ Սակայն շատ հետազոտություններում արդյունքը երկընտրանքային է․ օրինակ՝ անձը վարկ ստացե՞լ է, թե՞ ոչ, տնային տնտեսությունը մասնակցե՞լ է ծրագրին, թե՞ ոչ, կազմակերպությունն օգտվո՞ւմ է թվային ծառայություններից, թե՞ ոչ։</p>
+      <p>Նման դեպքերում կիրառվում են Logit և Probit մոդելները։ Դրանց նպատակն է գնահատել իրադարձության տեղի ունենալու հավանականությունը՝ կախված բացատրող փոփոխականներից։</p>
+      <p><strong>Օրինակ․</strong> կարելի է ուսումնասիրել, թե ինչպես են տարիքը, կրթությունը, եկամուտը և թվային հմտությունները կապված առցանց բանկային ծառայություններից օգտվելու հավանականության հետ։ Կախյալ փոփոխականը սովորաբար կոդավորվում է 0 և 1 արժեքներով։</p>
+      <p>Logit և Probit մոդելներն օգտագործում են համապատասխան հավանականային ֆունկցիաներ՝ կանխատեսվող արժեքները 0-ից 1 միջակայքում պահելու համար։ Logit-ը հիմնված է լոգիստիկ բաշխման, իսկ Probit-ը՝ ստանդարտ նորմալ բաշխման կուտակային ֆունկցիայի վրա։</p>
+      <p>Այս մոդելների գործակիցները ուղղակիորեն չեն մեկնաբանվում որպես հավանականության փոփոխություն։ Դրանք ցույց են տալիս բացատրող փոփոխականի կապը համապատասխան մոդելային ցուցանիշի հետ։ Հավանականության փոփոխությունը մեկնաբանելու համար հաճախ հաշվարկվում են սահմանային ազդեցությունները։ Ընտրությունը սովորաբար կախված է մոդելավորման ենթադրություններից և կիրառական հարմարությունից։</p>
+    </div>
+
+    <div class="topic-divider">
+      <span>Դաս 2</span>
+      <h2>Արդյունավետության գնահատում, ընտրանքային հետազոտություն և քանակական արդյունքների հուսալիություն</h2>
+    </div>
+
+    <div class="card">
+      <h3>6. Տվյալների պարփակման վերլուծություն (Data Envelopment Analysis, DEA)</h3>
+      <p>Տնտեսական հետազոտություններում հաճախ անհրաժեշտ է գնահատել, թե որքան արդյունավետ են կազմակերպությունները, համայնքները, բուհերը կամ այլ միավորներ օգտագործում իրենց ռեսուրսները՝ որոշակի արդյունքներ ստանալու համար։</p>
+      <p>DEA-ն ոչ պարամետրային մեթոդ է, որով համեմատվում են որոշումներ կայացնող միավորները (Decision-Making Units, DMUs)՝ հաշվի առնելով դրանց մուտքային ռեսուրսներն ու ստացված արդյունքները։ Մեթոդի տրամաբանությունն այն է, որ արդյունավետությունը գնահատվում է համեմատական հիմունքով․ միավորները համեմատվում են տվյալների հիման վրա կառուցված արդյունավետության սահմանագծի հետ։</p>
+      <ul class="bullet-list">
+        <li><strong>Մուտքեր (Inputs).</strong> արդյունքի ստացման համար օգտագործվող ռեսուրսներ՝ ֆինանսավորում, աշխատողների թիվ, կապիտալ, սարքավորում կամ ժամանակ։</li>
+        <li><strong>Ելքեր (Outputs).</strong> մուտքերի օգտագործման արդյունքում ստացված արդյունքներ։ Բուհի դեպքում դրանք կարող են լինել շրջանավարտների թիվը, գիտական հրապարակումները կամ հետազոտական արդյունքները։</li>
+      </ul>
+      <p>DEA-ի առավելությունն այն է, որ թույլ է տալիս միաժամանակ դիտարկել մի քանի մուտք և ելք՝ առանց դրանց միջև նախապես որոշակի ֆունկցիոնալ կապ սահմանելու։ Արդյունքներով կարելի է բացահայտել համեմատաբար արդյունավետ միավորները, գնահատել մյուս միավորների հեռավորությունը արդյունավետության սահմանագծից և որոշել բարելավման հնարավոր ուղղությունները։</p>
+      <p><strong>Օրինակ․</strong> համայնքների արդյունավետությունը կարելի է համեմատել՝ հաշվի առնելով բյուջետային ծախսերն ու աշխատակազմի ռեսուրսները՝ մի կողմից, իսկ մատուցվող հանրային ծառայությունների ծավալն ու որակը՝ մյուս կողմից։</p>
+      <p>Կարևոր է ճիշտ ընտրել մուտքերն ու ելքերը, հիմնավորել դիտարկվող միավորների համադրելիությունը և հաշվի առնել տվյալների որակը։ Արդյունքը կախված է նաև ընտրանքում ընդգրկված միավորներից։ Բարձր գնահատականը չի նշանակում, որ միավորը բոլոր չափանիշներով լավագույնն է կամ բացարձակ իմաստով արդյունավետ։</p>
+    </div>
+
+    <div class="card">
+      <h3>7. Ընտրանքային հետազոտություն (Sample Survey)</h3>
+      <p>Ընտրանքային հետազոտության ընթացքում ամբողջ նպատակային համակցության փոխարեն ուսումնասիրվում է դրա որոշակի մասը՝ ընտրանքը։</p>
+      <ul class="bullet-list">
+        <li><strong>Նպատակային համակցություն (Target Population).</strong> այն բոլոր միավորները, որոնց վերաբերյալ հետազոտողը ցանկանում է եզրակացություններ անել։</li>
+        <li><strong>Ընտրանքային շրջանակ (Sampling Frame).</strong> ցուցակ կամ մեխանիզմ, որի միջոցով հնարավոր է նույնականացնել ընտրության ենթակա միավորները։</li>
+        <li><strong>Ընտրանք (Sample).</strong> փաստացի ընտրված և ուսումնասիրված միավորների ամբողջությունը։</li>
+      </ul>
+      <p><strong>Օրինակ․</strong> Հայաստանի տնային տնտեսությունների ֆինանսական վարքագիծն ուսումնասիրելիս նպատակային համակցությունը Հայաստանի բոլոր տնային տնտեսություններն են։ Ընտրանքային շրջանակը պետք է ապահովի դրանց նույնականացումն ու հասանելիությունը, իսկ ընտրանքը կազմված է հենց հետազոտության մեջ ընդգրկված տնային տնտեսություններից։</p>
+      <p>Ընտրանքի ձևավորումից կախված են ներկայացուցչականությունը, գնահատականների ճշգրտությունը և եզրակացությունների ընդհանրացման հնարավորությունը։</p>
+    </div>
+
+    <div class="card">
+      <h3>7.1. Ընտրանքի ձևավորման հիմնական մոտեցումները</h3>
+      <ul class="bullet-list">
+        <li><strong>Պարզ պատահական ընտրանք.</strong> նպատակային համակցության յուրաքանչյուր միավոր ունի հայտնի և հավասար ընտրության հավանականություն։ Մեթոդը հեշտ է մեկնաբանել, բայց պահանջում է համակցության ամբողջական ու որակյալ շրջանակ։</li>
+        <li><strong>Շերտավորված ընտրանք.</strong> համակցությունը նախ բաժանվում է շերտերի՝ ըստ կարևոր բնութագրերի, օրինակ՝ տարածաշրջանի, բնակավայրի տեսակի կամ կազմակերպության չափի, ապա յուրաքանչյուր շերտից ընտրվում են դիտարկումներ։ Սա կարող է բարելավել ճշգրտությունը և ապահովել փոքր, բայց կարևոր խմբերի ներկայացվածությունը։</li>
+        <li><strong>Երկաստիճան ընտրանք.</strong> ընտրությունը կատարվում է հաջորդական փուլերով․ նախ ընտրվում են խոշոր միավորներ՝ օրինակ բնակավայրերը կամ համայնքները, ապա դրանց ներսում՝ տնային տնտեսությունները կամ անհատները։ Այն հաճախ կիրառվում է խոշոր տարածքային հետազոտություններում՝ կազմակերպչական ծախսերը նվազեցնելու համար։</li>
+      </ul>
+      <p>Ընտրանքի չափը հիմնավորվում է հետազոտության նպատակով, գնահատվող ցուցանիշի փոփոխականությամբ, ցանկալի ճշգրտությամբ, վստահության մակարդակով և ընտրանքի ձևավորմամբ։ Մեծ ընտրանքը ինքնաբերաբար չի ապահովում բարձր որակ․ համակարգված ընտրանքային սխալն ու չպատասխանելու խնդիրը կարող են պահպանվել նաև մեծ հետազոտություններում։</p>
+    </div>
+
+    <div class="card">
+      <h3>8. Հարցաթերթի նախագծում և չափումների հուսալիություն</h3>
+      <p>Հարցաթերթային հետազոտության տվյալների որակը կախված է հարցերի ձևակերպումից, պատասխանների սանդղակներից և գործիքի կառուցվածքից։ Հարցերը պետք է լինեն հստակ, հասկանալի ու հնարավորինս չեզոք։ Պետք է խուսափել երկիմաստ ձևակերպումներից, մեկ հարցում մի քանի տարբեր հարց միավորելուց և պատասխանողին ուղղորդող ձևակերպումներից։</p>
+      <p>Համաձայնության աստիճանը չափելու համար կարող է կիրառվել Լիկերտի սանդղակը։ Հարցաթերթը պետք է նախապես փորձարկել փոքր խմբի վրա՝ ստուգելու հարցերի ընկալելիությունը, պատասխանի տարբերակների բավարարությունը և հարցման ընթացակարգի գործնական կիրառելիությունը։</p>
+    </div>
+
+    <div class="card">
+      <h3>8.1. Cronbach’s alpha և ներքին համաձայնեցվածություն</h3>
+      <p>Եթե մի քանի հարցով չափվում է մեկ ընդհանուր կառուցվածք, պետք է գնահատել՝ արդյոք հարցերի պատասխանները բավականաչափ համահունչ են։ Cronbach’s alpha գործակիցը կիրառվում է բազմահարց սանդղակի ներքին համաձայնեցվածությունը գնահատելու համար, օրինակ՝ վերաբերմունքի, բավարարվածության կամ ընկալվող որակի սանդղակներում։</p>
+      <p>Գործակցի բարձր արժեքը կարող է վկայել հարցերի ներքին համաձայնեցվածության մասին, բայց ինքնին չի ապացուցում, որ բոլոր հարցերը չափում են մեկ և միայն մեկ կառուցվածք։ Այն նաև չի ապացուցում չափման գործիքի վավերությունը։</p>
+      <p>Պետք է տարբերակել հետևյալ հասկացությունները․</p>
+      <ul class="bullet-list">
+        <li><strong>Հուսալիություն (Reliability).</strong> չափման արդյունքների հետևողականությունը կամ կայունությունը։</li>
+        <li><strong>Վավերություն (Validity).</strong> արդյոք գործիքն իսկապես չափում է այն հասկացությունը, որը նախատեսված է չափելու համար։</li>
+      </ul>
+      <p>Այս տարբերակումը կարևոր է լատենտ փոփոխականների հետազոտության և SEM-ի կիրառման դեպքում։</p>
+    </div>
+
+    <div class="card">
+      <h3>9. Պատճառահետևանքային եզրակացություններ (Causal Inference)</h3>
+      <p>Քանակական հետազոտության խնդիրներից է ոչ միայն փոփոխականների միջև վիճակագրական կապի բացահայտումը, այլև պատճառահետևանքային ազդեցության գնահատումը։</p>
+      <p><strong>Օրինակ․</strong> եթե թվային ծառայություններից օգտվող կազմակերպություններն ունեն ավելի բարձր արտադրողականություն, դեռևս չի կարելի եզրակացնել, որ թվայնացումն ինքնին բարձրացրել է արտադրողականությունը։ Հնարավոր է, որ ավելի արդյունավետ կազմակերպություններն ավելի հաճախ են ներդնում թվային տեխնոլոգիաներ, կամ երկու ցուցանիշների վրա ազդում են այլ գործոններ։</p>
+      <p>Պատճառահետևանքային եզրակացության համար անհրաժեշտ է հստակ ձևակերպել՝ ինչ ազդեցություն է գնահատվում, ինչ համեմատության հիման վրա և ինչ ենթադրություններով։ Կարող են կիրառվել փորձարարական ու քվազիփորձարարական նախագծեր, տարբերակների տարբերության մեթոդը (Difference-in-Differences), գործիքային փոփոխականները (Instrumental Variables) և այլ մոտեցումներ։ Այս մեթոդները տարբեր ենթադրություններ և կիրառման պայմաններ ունեն։</p>
+      <p>Ռեգրեսիոն գործակցի վիճակագրական նշանակալիությունն ինքնին պատճառական կապի ապացույց չէ։ Հետազոտողը պետք է ներկայացնի, թե ինչու է ընտրված մեթոդը թույլ տալիս պատճառահետևանքային մեկնաբանություն և ինչ սահմանափակումներ ունի այն։</p>
+    </div>
+
+    <div class="card">
+      <h3>10. Տարածական էկոնոմետրիկա (Spatial Econometrics)</h3>
+      <p>Տնտեսական և սոցիալական երևույթները կարող են տարածականորեն փոխկապակցված լինել։ Տարածաշրջանի տնտեսական արդյունքները կարող են կախված լինել ոչ միայն դրա ներքին բնութագրերից, այլև հարևան տարածաշրջաններում ընթացող գործընթացներից։</p>
+      <p><strong>Օրինակ․</strong> մի համայնքում աշխատատեղերի ստեղծումը կարող է ազդել հարևան համայնքների զբաղվածության վրա, իսկ մի տարածաշրջանում ենթակառուցվածքների զարգացումը՝ հարակից տարածքների տնտեսական ակտիվության վրա։</p>
+      <p>Տարածական էկոնոմետրիկան ուսումնասիրում է տարածական կախվածությունն ու տարածական տարբերությունները քանակական մոդելների միջոցով։ Տարածական կապերը ներկայացնելու համար, օրինակ, կիրառվում է տարածական կշիռների մատրից, որը սահմանում է հարևան միավորները և դրանց կապերի կշիռները։</p>
+      <p>Հիմնական խնդիրներն են՝</p>
+      <ul class="bullet-list">
+        <li>տարածական ավտոկոռելյացիայի հայտնաբերումը,</li>
+        <li>տարածականորեն փոխկապակցված արդյունքների մոդելավորումը,</li>
+        <li>հարևան տարածքների հնարավոր ազդեցությունների գնահատումը,</li>
+        <li>տարածական անհավասարությունների և կլաստերների բացահայտումը։</li>
+      </ul>
+      <p>Մեթոդը կիրառվում է համայնքային զարգացման, բնակարանային շուկայի, տարածաշրջանային անհավասարությունների, տրանսպորտի և տեղական տնտեսական քաղաքականության ուսումնասիրություններում։ Պետք է հիմնավորել տարածական կապերի սահմանումը, քանի որ հարևանությունը տարբեր կերպ որոշելը կարող է տարբեր արդյունքների հանգեցնել։</p>
+    </div>
+
+    <div class="card">
+      <h3>11. Արդյունքների հուսալիություն, կայունության ստուգումներ և թափանցիկություն</h3>
+      <p>Քանակական հետազոտության որակը որոշվում է ոչ միայն կիրառված մեթոդով, այլև նրանով, թե որքանով են արդյունքները հուսալի, վերարտադրելի և կայուն այլընտրանքային հիմնավորված ենթադրությունների նկատմամբ։</p>
+      <p>Կայունության ստուգումները (Robustness Checks) պարզում են՝ արդյոք հիմնական եզրակացությունները պահպանվում են վերլուծության որոշ հիմնավորված փոփոխությունների դեպքում։ Հետազոտողը կարող է՝</p>
+      <ul class="bullet-list">
+        <li>օգտագործել կախյալ փոփոխականի այլընտրանքային չափում,</li>
+        <li>փոխել մոդելում ներառված վերահսկող փոփոխականների կազմը,</li>
+        <li>կիրառել այլընտրանքային գնահատման մեթոդ,</li>
+        <li>ստուգել արդյունքների զգայունությունը որոշ դիտարկումների նկատմամբ,</li>
+        <li>համեմատել տարբեր ընտրանքներով ստացված գնահատականները։</li>
+      </ul>
+      <p>Կայունության ստուգումը չի նշանակում փորձել բոլոր հնարավոր մոդելները՝ ցանկալի արդյունք ստանալու համար։ Ստուգումները պետք է համապատասխանեն հետազոտական տրամաբանությանը, իսկ տարբերակների ընտրությունն ու արդյունքները՝ ներկայացվեն թափանցիկ։</p>
+      <p>Թափանցիկությունը ներառում է տվյալների աղբյուրների, փոփոխականների սահմանումների, ընտրանքի ձևավորման, մոդելի բնութագրերի և գնահատման ընթացակարգերի հստակ նկարագրությունը։ Եթե տվյալների գաղտնիության պայմանները թույլ են տալիս, նպատակահարմար է տրամադրել վերլուծության կոդն ու օգտագործված տվյալները։ Դա հնարավորություն է տալիս այլ հետազոտողներին հասկանալ, ստուգել և գնահատել վերլուծության հիմքերը։</p>
+    </div>
+
+    <div class="card">
+      <h3>12. Քանակական մեթոդի ընտրության ընդհանուր տրամաբանությունը</h3>
+      <p>Մեթոդի ընտրությունը պետք է բխի հետազոտական հարցից, ոչ թե հակառակը։ Հետազոտողը նախ որոշում է՝ ինչ է ցանկանում պարզել, ապա՝ ինչ տվյալներ են անհրաժեշտ, և միայն դրանից հետո ընտրում համապատասխան մեթոդը։</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Հետազոտական խնդիր</th><th>Համապատասխան մեթոդ</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Ինչպե՞ս է X-ը կապված շարունակական Y-ի հետ</td><td>Ռեգրեսիոն վերլուծություն</td></tr>
+            <tr><td>Ինչպե՞ս է ցուցանիշը փոխվում ժամանակի ընթացքում</td><td>Ժամանակային շարքերի վերլուծություն</td></tr>
+            <tr><td>Ինչպե՞ս են տարբեր միավորները փոխվում ժամանակի ընթացքում</td><td>Պանելային մոդելներ</td></tr>
+            <tr><td>Ինչպե՞ս նվազեցնել մեծ թվով փոխկապակցված ցուցանիշների չափայնությունը</td><td>PCA</td></tr>
+            <tr><td>Ի՞նչ թաքնված գործոններ են բացատրում դիտարկվող ցուցանիշների կապերը</td><td>Գործոնային վերլուծություն</td></tr>
+            <tr><td>Ինչպե՞ս են փոխկապակցված դիտարկվող և լատենտ փոփոխականները</td><td>SEM</td></tr>
+            <tr><td>Ո՞ր գործոններն են կապված իրադարձության տեղի ունենալու հավանականության հետ</td><td>Logit / Probit</td></tr>
+            <tr><td>Որքա՞ն արդյունավետ են միավորներն իրենց մուտքերի և ելքերի համեմատությամբ</td><td>DEA</td></tr>
+            <tr><td>Ինչպե՞ս եզրակացություններ անել ամբողջ համակցության մասին ընտրանքի հիման վրա</td><td>Ընտրանքային հետազոտություն</td></tr>
+            <tr><td>Ինչպե՞ս գնահատել հարևան տարածքների միջև փոխկապակցվածությունը</td><td>Տարածական էկոնոմետրիկա</td></tr>
+            <tr><td>Ինչպե՞ս հիմնավորել պատճառահետևանքային ազդեցությունը</td><td>Causal Inference</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Աղյուսակը ներկայացնում է մեթոդների ընտրության ընդհանուր կողմնորոշիչը, ոչ թե մենակ հնարավոր տարբերակը։ Իրական հետազոտություններում կարելի է համադրել մի քանի մոտեցում, եթե դա հիմնավորված է խնդրով և տվյալների կառուցվածքով։</p>
+    </div>
+
+    <div class="card">
+      <h3>Եզրակացություն</h3>
+      <p>Հատուկ քանակական մեթոդները էմպիրիկ հետազոտության գործիքակազմն են, որի միջոցով թվային տվյալները վերածվում են գիտականորեն հիմնավորված եզրակացությունների։ Դրանց ճիշտ կիրառումը պահանջում է հասկանալ ոչ միայն տեխնիկական առանձնահատկությունները, այլև կիրառման պայմանները, ենթադրություններն ու սահմանափակումները։</p>
+      <p>Ռեգրեսիոն վերլուծությունը հնարավորություն է տալիս գնահատել փոփոխականների միջև կապերը, PCA-ն և գործոնային վերլուծությունը՝ ուսումնասիրել բազմաչափ տվյալների կառուցվածքը, SEM-ը՝ մոդելավորել փոխկապակցված ու լատենտ կառուցվածքները, Logit/Probit-ը՝ վերլուծել երկընտրանքային արդյունքները, իսկ DEA-ն՝ համեմատել տարբեր միավորների հարաբերական արդյունավետությունը։ Ընտրանքային հետազոտությունն ապահովում է տվյալների հավաքագրման և ընդհանրացման մեթոդաբանական հիմքը, իսկ պատճառահետևանքային ու տարածական վերլուծության մոտեցումները հնարավորություն են տալիս լուծել ավելի բարդ հետազոտական խնդիրներ։</p>
+      <p>Բոլոր մեթոդների կիրառման ժամանակ անհրաժեշտ է ապահովել տվյալների որակը, ստուգել համապատասխան ենթադրությունները, գնահատել արդյունքների կայունությունը և թափանցիկ ներկայացնել հետազոտության ընթացակարգը։ Միայն այդ պայմաններում քանակական վերլուծությունը կարող է ոչ թե պարզապես թվային արդյունքներ տալ, այլ հիմնավորված պատասխանել հետազոտական հարցին։</p>
+    </div>
+  </section>
+
+  <div class="footer-note">Թեմա 4.1 · Հատուկ քանակական մեթոդները էմպիրիկ հետազոտություններում</div>
+</div>
+
+      <div id="topic5" class="topic-content" hidden>
+        <header class="hero">
+          <span class="hero-label">Թեմա 5</span>
+          <h1>Կառավարման համակարգերի հետազոտության պլանավորումը և կազմակերպումը</h1>
+          <p>Այս թեմայի նյութերը կավելացվեն համապատասխան հարցերի և դասընթացի նյութերի հիման վրա։</p>
+        </header>
+        <div class="placeholder"><div class="placeholder-inner"><div class="placeholder-icon">🗂️</div><h2>Թեմայի բաժինը պատրաստ է</h2><p>Ուղարկիր թեմա 5-ի հարցերն ու նյութերը, և դրանք կտեղադրվեն այստեղ՝ առանձին, մանրամասն բաժնով։</p></div></div>
+      </div>
+
+      <div id="topic6" class="topic-content" hidden>
+        <header class="hero">
+          <span class="hero-label">Թեմա 6</span>
+          <h1>Հետազոտության արդյունքների արդյունավետության գնահատում</h1>
+          <p>Այս թեմայի նյութերը կավելացվեն համապատասխան հարցերի և դասընթացի նյութերի հիման վրա։</p>
+        </header>
+        <div class="placeholder"><div class="placeholder-inner"><div class="placeholder-icon">🎯</div><h2>Թեմայի բաժինը պատրաստ է</h2><p>Ուղարկիր թեմա 6-ի հարցերն ու նյութերը, և դրանք կտեղադրվեն այստեղ՝ առանձին, մանրամասն բաժնով։</p></div></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const topics = [
+      { id: "topic1", number: "01", label: "Թեմա 1", title: "Կառավարման համակարգը որպես հետազոտության օբյեկտ: Համակարգային մոտեցումը կառավարման համակարգերի հետազոտության գործընթացում" },
+      { id: "topic2", number: "02", label: "Թեմա 2", title: "Կառավարման համակարգերի հետազոտության մեթոդաբանությունը" },
+      { id: "topic3", number: "03", label: "Թեմա 3", title: "Տեղեկատվության ուսումնասիրությունը և թեստավորումը կառավարման համակարգերի հետազոտություններում" },
+      { id: "topic4", number: "04", label: "Թեմա 4", title: "Փորձագիտական գնահատումների մեթոդները կառավարման համակարգերի հետազոտությունում" },
+      { id: "topic4-1", number: "4.1", label: "Թեմա 4.1", title: "Քանակական հատուկ մեթոդներ" },
+      { id: "topic5", number: "05", label: "Թեմա 5", title: "Կառավարման համակարգերի հետազոտության պլանավորումը և կազմակերպումը" },
+      { id: "topic6", number: "06", label: "Թեմա 6", title: "Հետազոտության արդյունքների արդյունավետության գնահատում" }
+    ];
+
+    const nav = document.getElementById("topicNav");
+
+    topics.forEach((topic, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "topic-button" + (index === 0 ? " active" : "");
+      button.setAttribute("aria-current", index === 0 ? "page" : "false");
+      button.innerHTML = `
+        <span class="topic-number">${topic.number}</span>
+        <span class="topic-name">${topic.label}</span>
+      `;
+      button.title = topic.title;
+      button.addEventListener("click", () => showTopic(topic.id, button));
+      nav.appendChild(button);
+    });
+
+    function showTopic(id, selectedButton) {
+      document.querySelectorAll(".topic-content").forEach(section => {
+        section.hidden = section.id !== id;
+      });
+
+      document.querySelectorAll(".topic-button").forEach(button => {
+        button.classList.remove("active");
+        button.setAttribute("aria-current", "false");
+      });
+
+      selectedButton.classList.add("active");
+      selectedButton.setAttribute("aria-current", "page");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const themeButton = document.getElementById("themeButton");
+    const mobileThemeButton = document.getElementById("mobileThemeButton");
+
+    function setTheme(isDark) {
+      document.body.classList.toggle("dark", isDark);
+      localStorage.setItem("methodology-theme", isDark ? "dark" : "light");
+      document.getElementById("themeIcon").textContent = isDark ? "☀" : "☾";
+      document.getElementById("themeText").textContent = isDark ? "Լույս ռեժիմ" : "Մութ ռեժիմ";
+      mobileThemeButton.textContent = isDark ? "☀" : "☾";
+      mobileThemeButton.setAttribute("aria-label", isDark ? "Միացնել լուսավոր ռեժիմը" : "Միացնել մութ ռեժիմը");
+    }
+
+    function toggleTheme() {
+      setTheme(!document.body.classList.contains("dark"));
+    }
+
+    themeButton.addEventListener("click", toggleTheme);
+    mobileThemeButton.addEventListener("click", toggleTheme);
+
+    setTheme(localStorage.getItem("methodology-theme") === "dark");
+
+    async function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+        } else {
+          await document.exitFullscreen();
+        }
+      } catch (error) {
+        console.warn("Ամբողջ էկրանի ռեժիմը հասանելի չէ այս միջավայրում։", error);
+      }
+    }
+  </script>
+</body>
+</html>
